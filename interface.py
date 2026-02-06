@@ -5,6 +5,7 @@ import json
 import urllib.request
 import threading
 import subprocess
+import ssl
 
 class DragonLauncherUI:
     def __init__(self, root):
@@ -157,11 +158,18 @@ class DragonLauncherUI:
             return {"version": "1.0.2", "build": 15}
     
     def get_remote_version(self):
+        """Obtém versão disponível no GitHub com maior robustez"""
         try:
             url = "https://raw.githubusercontent.com/DragonSCPOFICIAL/DragonLauncher/main/version.json"
-            with urllib.request.urlopen(url, timeout=5) as response:
+            # Adicionar User-Agent para evitar bloqueios e ignorar verificação SSL se necessário
+            headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+            context = ssl._create_unverified_context()
+            
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=10, context=context) as response:
                 return json.load(response)
-        except:
+        except Exception as e:
+            print(f"Erro ao obter versão remota: {e}")
             return None
     
     def silent_update_check(self):

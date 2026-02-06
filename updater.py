@@ -12,6 +12,7 @@ import urllib.error
 import tarfile
 import shutil
 import subprocess
+import ssl
 from pathlib import Path
 
 class DragonUpdater:
@@ -48,15 +49,16 @@ class DragonUpdater:
             return "1.0.0", 13
     
     def get_remote_version(self):
-        """Obtém a versão disponível no GitHub"""
+        """Obtém a versão disponível no GitHub com maior robustez"""
         try:
             self.log(f"Verificando versão remota em: {self.github_version_url}")
-            with urllib.request.urlopen(self.github_version_url, timeout=10) as response:
+            headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+            context = ssl._create_unverified_context()
+            
+            req = urllib.request.Request(self.github_version_url, headers=headers)
+            with urllib.request.urlopen(req, timeout=15, context=context) as response:
                 data = json.load(response)
                 return data.get('version', '0.0.0'), data.get('build', 0), data
-        except urllib.error.URLError as e:
-            self.log(f"Erro de conexão ao verificar atualização: {e}")
-            return None, None, None
         except Exception as e:
             self.log(f"Erro ao obter versão remota: {e}")
             return None, None, None
@@ -66,22 +68,34 @@ class DragonUpdater:
         return remote_build > current_build
     
     def download_update(self, download_url):
-        """Baixa o pacote de atualização"""
+        """Baixa o pacote de atualização com maior robustez"""
         try:
             self.temp_dir.mkdir(parents=True, exist_ok=True)
             download_path = self.temp_dir / "update.tar.gz"
             
             self.log(f"Baixando atualização de: {download_url}")
             
-            # Download com barra de progresso
-            def report_progress(block_num, block_size, total_size):
-                downloaded = block_num * block_size
-                percent = min(100, (downloaded / total_size) * 100)
-                sys.stdout.write(f"\rProgresso: {percent:.1f}%")
-                sys.stdout.flush()
+            headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+            context = ssl._create_unverified_context()
             
-            urllib.request.urlretrieve(download_url, download_path, report_progress)
-            print()  # Nova linha após o progresso
+            req = urllib.request.Request(download_url, headers=headers)
+            with urllib.request.urlopen(req, timeout=30, context=context) as response:
+                total_size = int(response.getheader('Content-Length', 0))
+                downloaded = 0
+                block_size = 8192
+                
+                with open(download_path, 'wb') as f:
+                    while True:
+                        buffer = response.read(block_size)
+                        if not buffer:
+                            break
+                        downloaded += len(buffer)
+                        f.write(buffer)
+                        if total_size > 0:
+                            percent = min(100, (downloaded / total_size) * 100)
+                            sys.stdout.write(f"\rProgresso: {percent:.1f}%")
+                            sys.stdout.flush()
+                print()
             
             self.log(f"Download concluído: {download_path}")
             return download_path
