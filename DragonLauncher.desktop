@@ -1,9 +1,9 @@
 [Desktop Entry]
 Name=DragonLauncher
-Comment=Rodar jogos Windows com tradução DXGL
-Exec=/bin/bash /opt/dragonlauncher/DragonLauncher.sh
+Comment=Emulador de compatibilidade para jogos Windows
+Exec=/usr/bin/dragonlauncher
 Icon=system-run
 Terminal=false
 Type=Application
 Categories=Game;Utility;
-Path=/opt/dragonlauncher
+Keywords=wine;windows;games;launcher;
