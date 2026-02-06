@@ -6,17 +6,13 @@ pkgdesc="DragonLauncher: Emulador de compatibilidade para jogos Windows no Arch 
 arch=('x86_64')
 url="https://github.com/DragonSCPOFICIAL/DragonLauncher"
 license=('GPL3')
-depends=('wine' 'zenity' 'bash' 'wget')
+depends=('wine' 'zenity' 'bash')
 makedepends=('git')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/DragonSCPOFICIAL/DragonLauncher/archive/refs/heads/main.tar.gz")
 sha256sums=('SKIP')
 
 build() {
   cd "$srcdir/$pkgname-main"
-  
-  # Executar o script de download para obter os arquivos binários
-  echo "Baixando arquivos binários necessários..."
-  bash "Testador_DXGL/download-bins.sh" || echo "Aviso: Alguns arquivos binários podem não ter sido baixados"
 }
 
 package() {
@@ -26,20 +22,19 @@ package() {
   install -d "$pkgdir/opt/$pkgname"
   
   # Copiar os arquivos principais
-  install -m755 "Testador_DXGL/DragonLauncher.sh" "$pkgdir/opt/$pkgname/"
-  install -m644 "Testador_DXGL/DragonLauncher.desktop" "$pkgdir/opt/$pkgname/"
-  install -m644 "Testador_DXGL/COMO_USAR.txt" "$pkgdir/opt/$pkgname/"
-  install -m644 "Testador_DXGL/comandos.txt" "$pkgdir/opt/$pkgname/"
-  install -m644 "Testador_DXGL/download-bins.sh" "$pkgdir/opt/$pkgname/"
+  install -m755 "DragonLauncher.sh" "$pkgdir/opt/$pkgname/"
+  install -m644 "DragonLauncher.desktop" "$pkgdir/opt/$pkgname/"
+  install -m644 "COMO_USAR.txt" "$pkgdir/opt/$pkgname/"
+  install -m644 "comandos.txt" "$pkgdir/opt/$pkgname/"
   install -m644 "README.md" "$pkgdir/opt/$pkgname/"
   
   # Copiar configurações
   install -d "$pkgdir/opt/$pkgname/configs"
-  install -m644 "Testador_DXGL/configs/"* "$pkgdir/opt/$pkgname/configs/" 2>/dev/null || true
+  install -m644 "configs/"* "$pkgdir/opt/$pkgname/configs/" 2>/dev/null || true
   
-  # Copiar arquivos binários se existirem
-  if [ -d "Testador_DXGL/bin" ]; then
-    cp -r "Testador_DXGL/bin" "$pkgdir/opt/$pkgname/"
+  # Copiar arquivos binários
+  if [ -d "bin" ]; then
+    cp -r "bin" "$pkgdir/opt/$pkgname/"
     chmod -R 755 "$pkgdir/opt/$pkgname/bin"
   else
     install -d "$pkgdir/opt/$pkgname/bin/x32"
@@ -55,7 +50,7 @@ package() {
   
   # Instalar o arquivo .desktop no diretório de aplicações
   install -d "$pkgdir/usr/share/applications"
-  install -m644 "Testador_DXGL/DragonLauncher.desktop" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
+  install -m644 "DragonLauncher.desktop" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
   
   # Atualizar o arquivo .desktop para apontar para o novo local
   sed -i "s|Path=.*|Path=/opt/$pkgname|" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
