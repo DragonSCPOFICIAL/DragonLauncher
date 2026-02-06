@@ -1,0 +1,26 @@
+======================================================
+      DRAGONLAUNCHER DXGL - ARCH LINUX (KDE)
+======================================================
+
+Você agora tem um Launcher com interface gráfica!
+
+COMO USAR:
+1. Extraia a pasta "Testador_DXGL" para sua Área de Trabalho.
+2. Clique duas vezes no arquivo "DragonLauncher.sh" 
+   (ou no "DragonLauncher.desktop").
+3. O programa vai abrir uma janela para você:
+   - Selecionar o seu Jogo (.exe)
+   - Escolher qual Tradutor quer testar
+   - Iniciar o jogo automaticamente
+
+REQUISITOS:
+- Certifique-se de ter o 'zenity' instalado no seu Arch:
+  sudo pacman -S zenity wine
+
+VANTAGENS:
+- Totalmente isolado (não mexe no seu sistema).
+- Interface amigável igual a um emulador.
+- Você escolhe o tradutor na hora de abrir.
+
+Desenvolvido para a comunidade DragonHUB & DragonOS.
+======================================================

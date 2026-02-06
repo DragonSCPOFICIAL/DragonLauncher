@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=DragonLauncher DXGL
+Comment=Testador de Tradutores Isolado
+Exec=bash -c "cd %k && ./DragonLauncher.sh"
+Icon=system-run
+Terminal=false
+Type=Application
+Categories=Game;Utility;
+Path=
