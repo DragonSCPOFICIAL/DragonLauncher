@@ -1,33 +1,32 @@
 #!/bin/bash
 
-# DragonLauncher - Versão com Interface Dedicada
+# DragonLauncher - Versao com Interface Dedicada
 # Mantenedor: DragonSCPOFICIAL
 
-# 1. Configuração de Logs
+# 1. Configuracao de Logs
 LOG_FILE="$HOME/.dragonlauncher.log"
 echo "--- DragonLauncher Iniciado em $(date) ---" > "$LOG_FILE"
 exec 2>>"$LOG_FILE"
 
-# 2. Verificação de Dependências
+# 2. Verificacao de Dependencias
 for cmd in python3 wine file; do
     if ! command -v "$cmd" &> /dev/null; then
-        echo "ERRO: $cmd não encontrado!" | tee -a "$LOG_FILE"
+        echo "ERRO: $cmd nao encontrado!" | tee -a "$LOG_FILE"
         exit 1
     fi
 done
 
-# 3. Definir local da instalação
+# 3. Definir local da instalacao
 BASE_DIR="/opt/dragonlauncher"
 if [ ! -d "$BASE_DIR" ]; then
     BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 fi
 cd "$BASE_DIR" || exit 1
 
-# 4. Chamar a Interface Gráfica e capturar resultados
-# A interface imprime GAME_PATH=... e CHOICE=...
+# 4. Chamar a Interface Grafica e capturar resultados
 UI_OUTPUT=$(python3 "$BASE_DIR/interface.py")
 
-# Extrair variáveis da saída da interface
+# Extrair variaveis da saida da interface
 eval "$UI_OUTPUT"
 
 if [ -z "$GAME_PATH" ]; then
