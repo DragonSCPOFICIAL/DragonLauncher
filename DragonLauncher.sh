@@ -119,7 +119,7 @@ mkdir -p "$WINEPREFIX"
 echo "Wine Prefix: $WINEPREFIX" | tee -a "$LOG_FILE"
 
 # 10. Detectar arquitetura do jogo
-if [ "$ARCH" = "auto" ]; then
+if [ -z "$ARCH" ] || [ "$ARCH" = "auto" ]; then
     echo "Detectando arquitetura do jogo..." | tee -a "$LOG_FILE"
     
     if file "$GAME_PATH" | grep -q "x86-64"; then
@@ -130,8 +130,15 @@ if [ "$ARCH" = "auto" ]; then
         echo "Detectado: 32 bits" | tee -a "$LOG_FILE"
     fi
 else
-    DETECTED_ARCH="$ARCH"
-    echo "Arquitetura manual: $DETECTED_ARCH" | tee -a "$LOG_FILE"
+    # Se ARCH vier da interface (32 ou 64), converter para x32 ou x64
+    if [[ "$ARCH" == *"32"* ]]; then
+        DETECTED_ARCH="x32"
+    elif [[ "$ARCH" == *"64"* ]]; then
+        DETECTED_ARCH="x64"
+    else
+        DETECTED_ARCH="$ARCH"
+    fi
+    echo "Arquitetura definida: $DETECTED_ARCH" | tee -a "$LOG_FILE"
 fi
 
 BIN_DIR="$BASE_DIR/bin/$DETECTED_ARCH"
