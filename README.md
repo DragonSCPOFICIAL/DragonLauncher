@@ -28,6 +28,12 @@ git pull && makepkg -si
 
 ---
 
+## 🗑️ Desinstalação
+
+Para desinstalar completamente o DragonLauncher, siga as instruções detalhadas no arquivo `UNINSTALL.md` localizado na raiz do repositório. Ele cobre a remoção do pacote e de arquivos residuais.
+
+---
+
 ## 🎮 Como Usar
 
 Após a instalação, o DragonLauncher estará disponível no seu menu de aplicativos ou via terminal:
@@ -44,6 +50,7 @@ Após a instalação, o DragonLauncher estará disponível no seu menu de aplica
 - ✅ **Sistema de Logs:** Agora grava erros em `~/.dragonlauncher.log` para facilitar o diagnóstico.
 - ✅ **Erro de Versão:** Corrigido o erro de `pkgver` (agora funciona com ou sem tags Git).
 - ✅ **Arquitetura Automática:** Detecta se o jogo é 32 ou 64 bits.
+- ✅ **Robustez do Script:** Melhor tratamento de erros para dependências (`zenity`, `wine`, `file`) e caminhos de prefixo, evitando que o programa "morra" silenciosamente sem feedback ao usuário.
 
 ---
 
