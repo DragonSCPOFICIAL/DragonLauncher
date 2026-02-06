@@ -1,7 +1,7 @@
 # Maintainer: DragonSCPOFICIAL <dragon@dragonhub.com>
 pkgname=dragonlauncher
 pkgver=1.0.0
-pkgrel=10
+pkgrel=11
 pkgdesc="DragonLauncher: Emulador de compatibilidade para jogos Windows no Arch Linux."
 arch=('x86_64')
 url="https://github.com/DragonSCPOFICIAL/DragonLauncher"
@@ -15,7 +15,7 @@ prepare() {
   cd "$srcdir/DragonLauncher"
   # Garantir que o script de download tenha permissão de execução
   chmod +x download-bins.sh
-  # Baixar os binários durante a fase de preparação (opcional, mas garante que o pacote esteja completo)
+  # O download-bins.sh deve ser executado para garantir que os binários existam antes do empacotamento
   ./download-bins.sh
 }
 
@@ -27,11 +27,10 @@ package() {
   install -d "$pkgdir/usr/bin"
   install -d "$pkgdir/usr/share/applications"
   
-  # 2. Copiar arquivos (incluindo os binários baixados no prepare)
+  # 2. Copiar arquivos (incluindo a pasta bin preenchida pelo download-bins.sh)
   cp -r * "$pkgdir/opt/$pkgname/"
   
   # 3. Ajustar permissões
-  # Nota: 777 não é recomendado para segurança, mas mantido conforme desejo do usuário para evitar erros de escrita no prefixo/logs se necessário
   chmod -R 777 "$pkgdir/opt/$pkgname"
   chmod +x "$pkgdir/opt/$pkgname/DragonLauncher.sh"
   
@@ -41,6 +40,7 @@ package() {
   # 5. Instalar o atalho .desktop
   if [ -f "DragonLauncher.desktop" ]; then
     install -m 644 "DragonLauncher.desktop" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
+    # Garantir que o Exec aponte para o link simbólico ou para o bash chamando o script
     sed -i "s|Exec=.*|Exec=/usr/bin/dragonlauncher|" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
     sed -i "s|Path=.*|Path=/opt/$pkgname|" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
   fi
