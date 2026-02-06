@@ -1,15 +1,14 @@
 {
-  "version": "1.1.0",
-  "build": 18,
+  "version": "1.1.1",
+  "build": 19,
   "release_date": "2026-02-06",
   "update_check_url": "https://raw.githubusercontent.com/DragonSCPOFICIAL/DragonLauncher/main/version.json",
   "changelog": [
-    "NOVO: Sistema de Biblioteca de Jogos (Perfis)",
-    "NOVO: Salve seus jogos e configurações de tradutor",
-    "NOVO: Organização de tradutores por categorias (32 e 64 bits)",
-    "Interface totalmente reformulada com Sidebar e Grid de jogos",
-    "Persistência de dados em ~/.config/dragonlauncher",
-    "Detecção automática de arquitetura e tradutores compatíveis"
+    "Consolidação do Sistema de Biblioteca e Perfis",
+    "Melhoria na robustez da conexão com User-Agent e SSL",
+    "Otimização da detecção dinâmica de tradutores 32/64 bits",
+    "Ajustes finos na interface gráfica (800x600)",
+    "Correção de bugs menores na persistência de dados"
   ],
   "download_url": "https://github.com/DragonSCPOFICIAL/DragonLauncher/releases/latest/download/dragonlauncher-update.tar.gz",
   "min_version": "1.0.0"
