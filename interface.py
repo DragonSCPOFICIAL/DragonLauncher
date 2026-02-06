@@ -260,13 +260,15 @@ class DragonLauncherUI:
             self.show_library()
 
     def launch_game(self, game_id):
-        """Prepara as variáveis e fecha a interface para o script Bash assumir"""
+        """Chama o script de inicialização e fecha a interface"""
         data = self.profiles[game_id]
-        # IMPORTANTE: Imprimir as variáveis que o DragonLauncher.sh vai capturar via eval
-        print(f"GAME_PATH='{data['path']}'")
-        print(f"CHOICE='{data['translator']}'")
-        arch_val = data['arch'].replace(' bits', '').replace('x', '')
-        print(f"ARCH='{arch_val}'")
+        game_path = data['path']
+        translator = data['translator']
+        arch = data['arch']
+        
+        # Chamar o script Bash em um novo processo e fechar a interface
+        launcher_script = os.path.join(self.base_dir, "DragonLauncher.sh")
+        subprocess.Popen(["bash", launcher_script, "--launch", game_path, translator, arch])
         self.root.destroy()
 
     def detect_translators_by_arch(self):
