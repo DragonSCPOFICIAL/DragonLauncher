@@ -113,8 +113,8 @@ for file in "${X64_FILES[@]}"; do
     download_file "$GITHUB_RELEASE_URL/x64-$file" "$X64_DIR/$file" || true
 done
 
-# Baixar dgVoodooCpl.exe
-echo "Baixando dgVoodooCpl.exe..."
-download_file "$GITHUB_RELEASE_URL/dgVoodooCpl.exe" "$BIN_DIR/dgVoodooCpl.exe" || true
+# dgVoodooCpl.exe removido temporariamente para evitar erro de download
+# echo "Baixando dgVoodooCpl.exe..."
+# download_file "$GITHUB_RELEASE_URL/dgVoodooCpl.exe" "$BIN_DIR/dgVoodooCpl.exe" || true
 
 echo "✓ Download de binários concluído!"
