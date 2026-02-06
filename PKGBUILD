@@ -6,14 +6,17 @@ pkgdesc="DragonLauncher: Emulador de compatibilidade para jogos Windows no Arch 
 arch=('x86_64')
 url="https://github.com/DragonSCPOFICIAL/DragonLauncher"
 license=('GPL3')
-depends=('wine' 'zenity' 'bash')
+depends=('wine' 'zenity' 'bash' 'wget')
 makedepends=('git')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/DragonSCPOFICIAL/DragonLauncher/archive/refs/heads/main.tar.gz")
 sha256sums=('SKIP')
 
 build() {
   cd "$srcdir/$pkgname-main"
-  # Nada para compilar, apenas scripts shell
+  
+  # Executar o script de download para obter os arquivos binários
+  echo "Baixando arquivos binários necessários..."
+  bash "Testador_DXGL/download-bins.sh" || echo "Aviso: Alguns arquivos binários podem não ter sido baixados"
 }
 
 package() {
@@ -27,11 +30,21 @@ package() {
   install -m644 "Testador_DXGL/DragonLauncher.desktop" "$pkgdir/opt/$pkgname/"
   install -m644 "Testador_DXGL/COMO_USAR.txt" "$pkgdir/opt/$pkgname/"
   install -m644 "Testador_DXGL/comandos.txt" "$pkgdir/opt/$pkgname/"
+  install -m644 "Testador_DXGL/download-bins.sh" "$pkgdir/opt/$pkgname/"
   install -m644 "README.md" "$pkgdir/opt/$pkgname/"
   
   # Copiar configurações
   install -d "$pkgdir/opt/$pkgname/configs"
-  install -m644 "Testador_DXGL/configs/"* "$pkgdir/opt/$pkgname/configs/"
+  install -m644 "Testador_DXGL/configs/"* "$pkgdir/opt/$pkgname/configs/" 2>/dev/null || true
+  
+  # Copiar arquivos binários se existirem
+  if [ -d "Testador_DXGL/bin" ]; then
+    cp -r "Testador_DXGL/bin" "$pkgdir/opt/$pkgname/"
+    chmod -R 755 "$pkgdir/opt/$pkgname/bin"
+  else
+    install -d "$pkgdir/opt/$pkgname/bin/x32"
+    install -d "$pkgdir/opt/$pkgname/bin/x64"
+  fi
   
   # Criar diretório para prefixo isolado
   install -d "$pkgdir/opt/$pkgname/prefixo_isolado"
