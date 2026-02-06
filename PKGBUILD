@@ -1,12 +1,12 @@
 # Maintainer: DragonSCPOFICIAL <dragon@dragonhub.com>
 pkgname=dragonlauncher
 pkgver=1.0.0
-pkgrel=12
+pkgrel=13
 pkgdesc="DragonLauncher: Emulador de compatibilidade para jogos Windows no Arch Linux com interface dedicada."
 arch=('x86_64')
 url="https://github.com/DragonSCPOFICIAL/DragonLauncher"
 license=('GPL3')
-depends=('wine' 'python' 'python-tk' 'bash' 'file' 'wget')
+depends=('wine' 'python' 'tk' 'bash' 'file' 'wget')
 makedepends=('git')
 source=("git+https://github.com/DragonSCPOFICIAL/DragonLauncher.git")
 sha256sums=('SKIP')
