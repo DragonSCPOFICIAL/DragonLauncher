@@ -1,36 +1,52 @@
+# Maintainer: DragonSCPOFICIAL <dragon@dragonhub.com>
 pkgname=dragonlauncher
-pkgver=1.0
+pkgver=1.0.0
 pkgrel=1
-pkgdesc="DragonLauncher: Um emulador de compatibilidade para testar tradutores de jogos (DirectX e OpenGL) no Arch Linux, utilizando Wine."
+pkgdesc="DragonLauncher: Emulador de compatibilidade para jogos Windows no Arch Linux, com tradução DirectX/OpenGL para hardware limitado."
 arch=('x86_64')
 url="https://github.com/DragonSCPOFICIAL/DragonLauncher"
 license=('GPL3')
-depends=('wine' 'zenity')
-source=("$pkgname-$pkgver.zip::https://github.com/DragonSCPOFICIAL/DragonLauncher/archive/refs/heads/main.zip")
-sha256sums=('SKIP') # Will update after fetching the actual archive
+depends=('wine' 'zenity' 'bash')
+makedepends=('git')
+source=("$pkgname-$pkgver.tar.gz::https://github.com/DragonSCPOFICIAL/DragonLauncher/archive/refs/heads/main.tar.gz")
+sha256sums=('SKIP')
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd "$srcdir/$pkgname-main"
+  # Nada para compilar, apenas scripts shell
 }
 
 package() {
-  install -d "$pkgdir/opt/$pkgname"
-  cp -r "$srcdir/$pkgname-$pkgver/Testador_DXGL/COMO_USAR.txt" "$pkgdir/opt/$pkgname/"
-  cp -r "$srcdir/$pkgname-$pkgver/Testador_DXGL/DragonLauncher.desktop" "$pkgdir/opt/$pkgname/"
-  cp -r "$srcdir/$pkgname-$pkgver/Testador_DXGL/DragonLauncher.sh" "$pkgdir/opt/$pkgname/"
-  cp -r "$srcdir/$pkgname-$pkgver/Testador_DXGL/comandos.txt" "$pkgdir/opt/$pkgname/"
-  cp -r "$srcdir/$pkgname-$pkgver/Testador_DXGL/configs" "$pkgdir/opt/$pkgname/"
-  cp -r "$srcdir/$pkgname-$pkgver/Testador_DXGL/prefixo_isolado" "$pkgdir/opt/$pkgname/"
+  cd "$srcdir/$pkgname-main"
   
-  # Criar link simbólico para o executável principal
+  # Criar diretório de instalação
+  install -d "$pkgdir/opt/$pkgname"
+  
+  # Copiar os arquivos principais
+  install -m755 "Testador_DXGL/DragonLauncher.sh" "$pkgdir/opt/$pkgname/"
+  install -m644 "Testador_DXGL/DragonLauncher.desktop" "$pkgdir/opt/$pkgname/"
+  install -m644 "Testador_DXGL/COMO_USAR.txt" "$pkgdir/opt/$pkgname/"
+  install -m644 "Testador_DXGL/comandos.txt" "$pkgdir/opt/$pkgname/"
+  install -m644 "README.md" "$pkgdir/opt/$pkgname/"
+  
+  # Copiar configurações
+  install -d "$pkgdir/opt/$pkgname/configs"
+  install -m644 "Testador_DXGL/configs/"* "$pkgdir/opt/$pkgname/configs/"
+  
+  # Criar diretório para prefixo isolado
+  install -d "$pkgdir/opt/$pkgname/prefixo_isolado"
+  
+  # Criar link simbólico para o executável principal em /usr/local/bin
   install -d "$pkgdir/usr/local/bin"
   ln -s "/opt/$pkgname/DragonLauncher.sh" "$pkgdir/usr/local/bin/dragonlauncher"
   
-  # Instalar o arquivo .desktop
+  # Instalar o arquivo .desktop no diretório de aplicações
   install -d "$pkgdir/usr/share/applications"
-  install -m644 "$srcdir/$pkgname-$pkgver/Testador_DXGL/DragonLauncher.desktop" "$pkgdir/usr/share/applications/"
+  install -m644 "Testador_DXGL/DragonLauncher.desktop" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
   
-  # Atualizar o caminho no .desktop para o novo local
-  sed -i "s|Path=.*|Path=/opt/$pkgname|" "$pkgdir/usr/share/applications/DragonLauncher.desktop"
-  sed -i "s|Exec=bash -c \"cd %k && ./DragonLauncher.sh\"|Exec=/usr/local/bin/dragonlauncher|" "$pkgdir/usr/share/applications/DragonLauncher.desktop"
+  # Atualizar o arquivo .desktop para apontar para o novo local
+  sed -i "s|Path=.*|Path=/opt/$pkgname|" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
+  sed -i "s|Exec=.*|Exec=/usr/local/bin/dragonlauncher|" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
+  sed -i "s|Name=.*|Name=DragonLauncher|" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
+  sed -i "s|Comment=.*|Comment=Emulador de compatibilidade para jogos Windows|" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
 }

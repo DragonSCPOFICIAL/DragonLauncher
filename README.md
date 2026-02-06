@@ -8,23 +8,17 @@ O **DragonLauncher** é um emulador de compatibilidade projetado para facilitar 
 
 Uma das principais inovações do DragonLauncher é sua capacidade de otimizar a execução de jogos em notebooks e sistemas com placas de vídeo integradas ou mais antigas. Ele realiza a **tradução de chamadas DirectX para OpenGL**, aproveitando o poder de processamento da CPU para compensar as limitações da GPU. Essa estratégia permite que jogos que normalmente não rodariam ou teriam desempenho insatisfatório em hardware menos potente, funcionem de maneira equilibrada e com performance aceitável, estendendo a compatibilidade a uma gama maior de dispositivos.
 
-O DragonLauncher-DXGL é uma ferramenta desenvolvida para facilitar o teste de tradutores gráficos (como DXGL, Mesa3D, e dgVoodoo2) em jogos Windows no ambiente Arch Linux, utilizando o Wine. Ele cria um ambiente isolado, garantindo que as modificações e testes não afetem a instalação principal do seu sistema.
-
 ## Funcionalidades
 
 *   **Interface Gráfica Amigável**: Utiliza `zenity` para uma experiência de usuário intuitiva, permitindo a seleção do jogo e do tradutor via janelas gráficas.
 *   **Ambiente Isolado**: Cria um `WINEPREFIX` dedicado para cada execução, mantendo seu sistema Arch Linux limpo e sem conflitos.
 *   **Seleção de Tradutores**: Permite escolher entre diferentes conjuntos de DLLs de tradução (Mesa3D + DXVK, dgVoodoo2, ou padrão Wine) no momento da execução.
 *   **Atalho de Desktop**: Integração com o ambiente de desktop para fácil acesso ao launcher.
+*   **Programa Isolado**: O DragonLauncher funciona como um programa independente que não altera o sistema operacional.
 
 ## Requisitos
 
-Para utilizar o DragonLauncher-DXGL, você precisará ter os seguintes pacotes instalados no seu Arch Linux:
-
-*   `wine`: Para executar aplicações Windows.
-*   `zenity`: Para a interface gráfica do launcher.
-
-Você pode instalá-los via `pacman`:
+Para utilizar o DragonLauncher, você precisará ter os seguintes pacotes instalados no seu Arch Linux:
 
 ```bash
 sudo pacman -S wine zenity
@@ -32,51 +26,73 @@ sudo pacman -S wine zenity
 
 ## Instalação (Estilo AUR)
 
-Para instalar o DragonLauncher-DXGL no seu sistema Arch Linux, siga os passos abaixo:
+### Passo 1: Clonar o Repositório
 
-1.  **Clonar o Repositório**:
+```bash
+git clone https://github.com/DragonSCPOFICIAL/DragonLauncher.git
+cd DragonLauncher
+```
 
-    ```bash
-git clone https://github.com/DragonSCPOFICIAL/DragonLauncher-DXGL.git
-cd DragonLauncher-DXGL
-    ```
+### Passo 2: Construir e Instalar o Pacote
 
-2.  **Construir e Instalar o Pacote**:
-
-    Utilize o `makepkg` para construir o pacote e, em seguida, instale-o com `pacman -U`.
-
-    ```bash
+```bash
 makepkg -si
-    ```
+```
 
-    *Nota: Se você encontrar erros de `sha256sums`, edite o `PKGBUILD` e altere `sha256sums=("SKIP")` para `sha256sums=("ANY")` temporariamente, ou atualize o `sha256sums` com o valor correto do arquivo baixado.* 
+O comando acima irá:
+- Baixar as dependências necessárias
+- Construir o pacote
+- Instalar o DragonLauncher como um programa no seu sistema Arch Linux
 
-## Uso
+## Como Usar
 
-Após a instalação, você pode iniciar o DragonLauncher-DXGL de duas maneiras:
+Após a instalação, você pode iniciar o DragonLauncher de duas maneiras:
 
-1.  **Pelo Menu de Aplicações**: Procure por "DragonLauncher DXGL" no seu menu de aplicações e clique para executá-lo.
-2.  **Pelo Terminal**:
+### Pelo Terminal
 
-    ```bash
-dragonlauncher-dxgl
-    ```
+```bash
+dragonlauncher
+```
 
-Ao iniciar, uma janela gráfica será exibida, permitindo que você:
+### Pelo Menu de Aplicações
 
-1.  **Selecione o Jogo (.exe)**: Navegue até o executável do jogo Windows que deseja testar.
-2.  **Escolha o Tradutor**: Selecione o tradutor gráfico desejado (Mesa3D + DXVK, dgVoodoo2, ou Padrão Wine).
-3.  **Inicie o Jogo**: O jogo será iniciado em um ambiente isolado com as configurações de tradução escolhidas.
+Procure por "DragonLauncher DXGL" no seu menu de aplicações (KDE Plasma, GNOME, etc.) e clique para executá-lo.
+
+## Fluxo de Uso
+
+1. **Abrir o Launcher**: Execute `dragonlauncher` ou clique no atalho de desktop
+2. **Selecionar o Jogo**: Uma janela do explorador de arquivos será aberta. Navegue até o local onde está o arquivo `.exe` do seu jogo Windows e selecione-o
+3. **Escolher o Tradutor**: Uma janela de diálogo aparecerá com as opções de tradutores disponíveis:
+   - **Mesa3D + DXVK**: Melhor performance para jogos modernos (utiliza Vulkan/OpenGL)
+   - **dgVoodoo2**: Melhor compatibilidade para jogos antigos (DirectX 1-8)
+   - **Padrão Wine**: Sem tradutores customizados (apenas teste)
+4. **Iniciar o Jogo**: Clique em "OK" e o jogo será iniciado em um ambiente isolado com as configurações de tradução escolhidas
 
 ## Estrutura do Projeto
 
-*   `PKGBUILD`: Arquivo de construção do pacote para Arch Linux.
-*   `DragonLauncher.sh`: O script principal do launcher, responsável pela interface gráfica e execução do Wine.
-*   `DragonLauncher.desktop`: Arquivo de atalho para integração com o ambiente de desktop.
-*   `COMO_USAR.txt`: Instruções básicas de uso.
-*   `bin/`: Contém as DLLs dos tradutores (x32 e x64).
-*   `configs/`: Arquivos de configuração para os tradutores.
-*   `prefixo_isolado/`: Diretório onde o `WINEPREFIX` isolado é criado.
+*   `DragonLauncher.sh`: O script principal do launcher, responsável pela interface gráfica e execução do Wine
+*   `DragonLauncher.desktop`: Arquivo de atalho para integração com o ambiente de desktop
+*   `PKGBUILD`: Arquivo de construção do pacote para Arch Linux
+*   `COMO_USAR.txt`: Instruções básicas de uso
+*   `configs/`: Arquivos de configuração para os tradutores
+*   `prefixo_isolado/`: Diretório onde o `WINEPREFIX` isolado é criado
+
+## Compatibilidade
+
+O DragonLauncher foi desenvolvido especificamente para o **Arch Linux** e é totalmente compatível com:
+
+- Arch Linux (todas as versões recentes)
+- KDE Plasma
+- GNOME
+- Outros ambientes de desktop baseados em X11 ou Wayland
+
+## Desinstalação
+
+Para desinstalar o DragonLauncher:
+
+```bash
+sudo pacman -R dragonlauncher
+```
 
 ## Contribuição
 
