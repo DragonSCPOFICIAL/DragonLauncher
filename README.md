@@ -50,7 +50,10 @@ Após a instalação, o DragonLauncher estará disponível no seu menu de aplica
 - ✅ **Sistema de Logs:** Agora grava erros em `~/.dragonlauncher.log` para facilitar o diagnóstico.
 - ✅ **Erro de Versão:** Corrigido o erro de `pkgver` (agora funciona com ou sem tags Git).
 - ✅ **Arquitetura Automática:** Detecta se o jogo é 32 ou 64 bits.
-- ✅ **Robustez do Script:** Melhor tratamento de erros para dependências (`zenity`, `wine`, `file`) e caminhos de prefixo, evitando que o programa "morra" silenciosamente sem feedback ao usuário.
+- ✅ **Robustez do Script:** Verificação real de dependências no início da execução.
+- ✅ **Interface Garantida:** O script agora valida se o Zenity está presente e fornece feedback visual em caso de erro.
+- ✅ **Instalação Completa:** O PKGBUILD agora baixa automaticamente os binários necessários durante a instalação.
+- ✅ **Sistema de Logs Real:** Agora grava logs detalhados em `~/.dragonlauncher.log`.
 
 ---
 
