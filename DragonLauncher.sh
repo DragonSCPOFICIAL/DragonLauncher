@@ -1,131 +1,85 @@
 #!/bin/bash
 
-# DragonLauncher - Script de Compatibilidade
+# DragonLauncher - Script de Compatibilidade Ultra-Robusto
 # Mantenedor: DragonSCPOFICIAL
 
-# --- Sistema de Log para Diagnóstico ---
-LOG_FILE="$HOME/.dragonlauncher.log"
-echo "--- Iniciando DragonLauncher em $(date) ---" > "$LOG_FILE"
-
-# Redirecionar saída para o log e para o terminal (se houver)
-exec > >(tee -a "$LOG_FILE") 2>&1
-
-# Verificar se o zenity funciona (necessário para a interface)
-if ! command -v zenity &> /dev/null; then
-    echo "ERRO: Zenity não instalado. O programa precisa dele para a interface."
-    exit 1
-fi
-
-# --- Configurações de Caminho ---
-# Resolve o caminho real se for um link simbólico
+# 1. Garantir que estamos no diretório correto e temos permissões
 SCRIPT_PATH=$(readlink -f "$0")
 BASE_DIR=$(dirname "$SCRIPT_PATH")
-echo "Diretório base detectado: $BASE_DIR"
+cd "$BASE_DIR" || exit 1
 
-# Definir prefixo de forma segura
-if [ -w "/opt/dragonlauncher" ]; then
-    PREFIX_DIR="/opt/dragonlauncher/prefixo_isolado"
-else
-    PREFIX_DIR="$HOME/.local/share/dragonlauncher/prefixo"
-    echo "Usando prefixo no Home (sem permissão em /opt): $PREFIX_DIR"
-fi
-mkdir -p "$PREFIX_DIR"
+# 2. Sistema de Log (para diagnóstico se algo falhar)
+LOG_FILE="$HOME/.dragonlauncher.log"
+echo "--- Iniciando DragonLauncher: $(date) ---" > "$LOG_FILE"
+exec > >(tee -a "$LOG_FILE") 2>&1
 
-BIN_X32="$BASE_DIR/bin/x32"
-BIN_X64="$BASE_DIR/bin/x64"
-
-# --- Verificações de Dependências ---
-check_dep() {
-    if ! command -v "$1" &> /dev/null; then
-        echo "ERRO: Dependência '$1' não encontrada."
-        # Tenta avisar via zenity se disponível, senão apenas loga
-        if command -v zenity &> /dev/null; then
-            zenity --error --text="Dependência ausente: $1\nPor favor, instale-a usando: sudo pacman -S $1" --title="DragonLauncher - Erro"
-        fi
-        exit 1
-    fi
-}
-
-# Verificar dependências essenciais
-check_dep "zenity"
-check_dep "wine"
-check_dep "file"
-
-# --- Interface Gráfica ---
-
-# 1. Selecionar o Jogo (.exe)
-echo "Abrindo seletor de arquivos..."
-GAME_PATH=$(zenity --file-selection --title="DragonLauncher - Selecione o Jogo (.exe)" --file-filter="Executáveis Windows | *.exe *.EXE")
-
-if [ -z "$GAME_PATH" ]; then
-    echo "Nenhum jogo selecionado. Saindo."
-    exit 0
-fi
-
-if [ ! -f "$GAME_PATH" ]; then
-    echo "ERRO: Arquivo não encontrado: $GAME_PATH"
-    zenity --error --text="O arquivo selecionado não existe."
+# 3. Verificação de Dependência Crítica (Interface)
+if ! command -v zenity &> /dev/null; then
+    echo "ERRO: Zenity não encontrado. Tentando avisar o usuário..."
+    # Se o zenity não existe, não temos como mostrar interface.
     exit 1
 fi
 
-echo "Jogo selecionado: $GAME_PATH"
+# 4. Interface Principal - Seleção de Jogo
+# Usamos um loop para garantir que a interface não feche sem motivo
+while true; do
+    GAME_PATH=$(zenity --file-selection --title="DragonLauncher - Selecione o Jogo (.exe)" --file-filter="Executáveis Windows | *.exe *.EXE")
+    
+    if [ -z "$GAME_PATH" ]; then
+        echo "Seleção cancelada pelo usuário."
+        exit 0
+    fi
 
-# 2. Menu de Seleção de Tradutor
+    if [ -f "$GAME_PATH" ]; then
+        break
+    else
+        zenity --error --text="Arquivo não encontrado: $GAME_PATH" --title="Erro de Seleção"
+    fi
+done
+
+# 5. Interface de Seleção de Tradutor
 CHOICE=$(zenity --list --radiolist --title="DragonLauncher - Escolha o Tradutor" \
+    --width=500 --height=300 \
     --column="Seleção" --column="Opção" --column="Descrição" \
     TRUE "Mesa3D + DXVK" "Melhor performance (Vulkan/OpenGL moderno)" \
     FALSE "dgVoodoo2" "Melhor compatibilidade para jogos antigos (DX 1-8)" \
     FALSE "Padrão Wine" "Sem tradutores customizados (Apenas teste)")
 
 if [ -z "$CHOICE" ]; then
-    echo "Nenhuma opção de tradutor escolhida. Saindo."
+    echo "Nenhuma opção escolhida. Saindo."
     exit 0
 fi
 
-echo "Tradutor escolhido: $CHOICE"
-
-# --- Configuração do Ambiente ---
-export WINEPREFIX="$PREFIX_DIR"
+# 6. Configuração de Ambiente
+export WINEPREFIX="$HOME/.dragonlauncher_prefix"
+mkdir -p "$WINEPREFIX"
 export WINEDEBUG=-all
 
-# Identificar arquitetura do executável
+# Detectar Arquitetura
 ARCH_INFO=$(file "$GAME_PATH")
 if echo "$ARCH_INFO" | grep -q "x86-64"; then
-    IS_64BIT="true"
-    echo "Arquitetura detectada: 64-bit"
+    BIN_DIR="$BASE_DIR/bin/x64"
+    echo "Arquitetura: 64-bit"
 else
-    IS_64BIT="false"
-    echo "Arquitetura detectada: 32-bit"
+    BIN_DIR="$BASE_DIR/bin/x32"
+    echo "Arquitetura: 32-bit"
 fi
 
+# Aplicar Tradutores
 case "$CHOICE" in
     "Mesa3D + DXVK")
         export WINEDLLOVERRIDES="d3d8,d3d9,d3d10,d3d10core,d3d11,dxgi,opengl32=n,b"
-        if [ "$IS_64BIT" = "true" ]; then
-            export LD_LIBRARY_PATH="$BIN_X64:$LD_LIBRARY_PATH"
-        else
-            export LD_LIBRARY_PATH="$BIN_X32:$LD_LIBRARY_PATH"
-        fi
-        [ -f "$BASE_DIR/configs/dragon.conf" ] && export DXVK_CONFIG_FILE="$BASE_DIR/configs/dragon.conf"
+        export LD_LIBRARY_PATH="$BIN_DIR:$LD_LIBRARY_PATH"
         ;;
     "dgVoodoo2")
         export WINEDLLOVERRIDES="ddraw,d3dimm,d3d8,d3d9=n,b"
-        if [ "$IS_64BIT" = "true" ]; then
-            export LD_LIBRARY_PATH="$BIN_X64:$LD_LIBRARY_PATH"
-        else
-            export LD_LIBRARY_PATH="$BIN_X32:$LD_LIBRARY_PATH"
-        fi
+        export LD_LIBRARY_PATH="$BIN_DIR:$LD_LIBRARY_PATH"
         ;;
     "Padrão Wine")
         export WINEDLLOVERRIDES=""
         ;;
 esac
 
-# --- Execução ---
-echo "Iniciando Wine..."
-zenity --info --text="Iniciando jogo com: $CHOICE\n\nArquivo: $(basename "$GAME_PATH")" --timeout=3 --title="DragonLauncher" &
-
-# Executar o jogo e capturar saída do Wine no log
-wine "$GAME_PATH" >> "$LOG_FILE" 2>&1
-
-echo "Jogo finalizado em $(date)."
+# 7. Execução Final
+zenity --info --text="Iniciando jogo com: $CHOICE\nAguarde..." --timeout=2 --title="DragonLauncher" &
+wine "$GAME_PATH"
