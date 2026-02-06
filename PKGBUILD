@@ -1,6 +1,6 @@
 # Maintainer: DragonSCPOFICIAL <dragon@dragonhub.com>
 pkgname=dragonlauncher
-pkgver=1.1.2
+pkgver=1.1.4
 pkgrel=1
 pkgdesc="DragonLauncher: Emulador de compatibilidade para jogos Windows no Arch Linux com interface dedicada e sistema de atualização automática."
 arch=('x86_64')

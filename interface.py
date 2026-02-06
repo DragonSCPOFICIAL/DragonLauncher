@@ -156,7 +156,14 @@ class DragonLauncherUI:
         path_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
         
         def browse():
-            f = filedialog.askopenfilename(filetypes=[("Executaveis", "*.exe")])
+            initial_dir = os.path.expanduser("~/Downloads")
+            if not os.path.exists(initial_dir):
+                initial_dir = os.path.expanduser("~")
+            f = filedialog.askopenfilename(
+                initialdir=initial_dir,
+                title="Selecionar Jogo",
+                filetypes=[("Executaveis", "*.exe"), ("Todos os arquivos", "*.*")]
+            )
             if f:
                 path_entry.delete(0, tk.END)
                 path_entry.insert(0, f)
