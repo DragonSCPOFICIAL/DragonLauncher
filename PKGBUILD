@@ -12,11 +12,11 @@ source=("$pkgname-$pkgver.tar.gz::https://github.com/DragonSCPOFICIAL/DragonLaun
 sha256sums=('SKIP')
 
 build() {
-  cd "$srcdir/$pkgname-main"
+  cd "$srcdir/DragonLauncher-main"
 }
 
 package() {
-  cd "$srcdir/$pkgname-main"
+  cd "$srcdir/DragonLauncher-main"
   
   # Criar diretório de instalação
   install -d "$pkgdir/opt/$pkgname"
