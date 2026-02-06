@@ -66,7 +66,7 @@ class DragonLauncherUI:
         ttk.Button(self.sidebar, text="Atualizações", command=self.check_updates).pack(fill=tk.X, padx=10, pady=5)
         ttk.Button(self.sidebar, text="Desinstalar", command=self.uninstall_app).pack(fill=tk.X, padx=10, pady=5)
         
-        self.footer_info = ttk.Label(self.sidebar, text="v1.1.0", foreground="#bdc3c7", background="#2c3e50", font=('Segoe UI', 8))
+        self.footer_info = ttk.Label(self.sidebar, text="v1.1.2", foreground="#bdc3c7", background="#2c3e50", font=('Segoe UI', 8))
         self.footer_info.pack(side=tk.BOTTOM, pady=10)
         
         # Área de Conteúdo (Direita)
@@ -207,11 +207,8 @@ class DragonLauncherUI:
 
     def edit_game_dialog(self, game_id):
         data = self.profiles[game_id]
-        self.add_game_dialog() # Reutiliza a janela
+        self.add_game_dialog()
         self.game_window.title(f"Editar: {data['name']}")
-        # Preencher campos (precisaria refatorar add_game_dialog para aceitar dados iniciais)
-        # Por brevidade nesta implementação, vamos apenas permitir adicionar novos por enquanto
-        # ou o usuário pode remover e adicionar de novo.
 
     def remove_game(self, game_id):
         if messagebox.askyesno("Confirmar", "Remover este jogo da biblioteca?"):
@@ -236,7 +233,6 @@ class DragonLauncherUI:
                 arch_path = os.path.join(bin_dir, arch)
                 if os.path.exists(arch_path):
                     files = os.listdir(arch_path)
-                    # Lógica de detecção inteligente
                     if "d3d11.dll" in files: target_list.append("DXVK")
                     if "opengl32.dll" in files: target_list.append("Mesa3D")
                     if "d3d12.dll" in files: target_list.append("VKD3D")
@@ -258,7 +254,16 @@ class DragonLauncherUI:
         with open(self.profiles_file, 'w') as f:
             json.dump(self.profiles, f, indent=4)
 
-    # Métodos de Atualização e Desinstalação (Mantidos da v1.0.4)
+    def get_version_info(self):
+        try:
+            version_file = os.path.join(self.base_dir, "version.json")
+            if os.path.exists(version_file):
+                with open(version_file, 'r') as f:
+                    return json.load(f)
+            return {"version": "1.1.1", "build": 19}
+        except:
+            return {"version": "1.1.1", "build": 19}
+
     def get_remote_version(self):
         try:
             url = "https://raw.githubusercontent.com/DragonSCPOFICIAL/DragonLauncher/main/version.json"
@@ -271,16 +276,39 @@ class DragonLauncherUI:
 
     def silent_update_check(self):
         remote = self.get_remote_version()
-        if remote and remote.get('build', 0) > 17: # Build atual v1.1.0 será 18
+        local = self.get_version_info()
+        if remote and remote.get('build', 0) > local.get('build', 0):
             self.root.after(0, lambda: self.footer_info.config(text="Nova versão disponível!", foreground="#e74c3c"))
 
     def check_updates(self):
-        messagebox.showinfo("Atualização", "Verificando atualizações...")
-        # Lógica de atualização aqui...
+        """Verifica e executa a atualização usando o novo sistema Raw"""
+        try:
+            local_info = self.get_version_info()
+            remote_info = self.get_remote_version()
+            
+            if not remote_info:
+                messagebox.showwarning("Atualização", "Não foi possível conectar ao servidor de atualizações.\nVerifique sua internet.")
+                return
+            
+            local_build = local_info.get('build', 0)
+            remote_build = remote_info.get('build', 0)
+            
+            if remote_build <= local_build:
+                messagebox.showinfo("Atualização", f"Você já está na versão mais recente!\nBuild: {local_build}")
+                return
+            
+            changelog = "\n".join([f"• {item}" for item in remote_info.get('changelog', [])])
+            if messagebox.askyesno("Nova Versão", f"Build {remote_build} disponível!\n\nNovidades:\n{changelog}\n\nAtualizar agora?"):
+                updater_path = os.path.join(self.base_dir, "updater.py")
+                cmd = f"x-terminal-emulator -e 'sudo python3 {updater_path}; echo; echo Pressione Enter para fechar...; read'"
+                subprocess.Popen(cmd, shell=True)
+                self.root.destroy()
+        except Exception as e:
+            messagebox.showerror("Erro", f"Falha na atualização: {e}")
 
     def uninstall_app(self):
         if messagebox.askyesno("Desinstalar", "Deseja remover o DragonLauncher?"):
-            subprocess.Popen(f"bash {self.base_dir}/uninstall.sh", shell=True)
+            subprocess.Popen(f"sudo bash {self.base_dir}/uninstall.sh", shell=True)
             self.root.destroy()
 
 if __name__ == "__main__":
