@@ -7,9 +7,11 @@ O DragonLauncher e uma solucao otimizada para rodar jogos Windows no Arch Linux,
 
 ## Instalacao e Atualizacao
 
-### Primeira Instalacao
+### Primeira Instalação (ou Reinstalação Limpa)
+Se você encontrar o erro `fatal: destination path 'DragonLauncher' already exists`, use o comando abaixo para remover a pasta antiga e instalar a nova versão:
+
 ```bash
-git clone https://github.com/DragonSCPOFICIAL/DragonLauncher.git && cd DragonLauncher && makepkg -si
+rm -rf DragonLauncher && git clone https://github.com/DragonSCPOFICIAL/DragonLauncher.git && cd DragonLauncher && makepkg -si
 ```
 
 ### Atualização Automática (Recomendado)
