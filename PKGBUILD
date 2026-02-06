@@ -1,22 +1,29 @@
 # Maintainer: DragonSCPOFICIAL <dragon@dragonhub.com>
 pkgname=dragonlauncher
 pkgver=1.0.0
-pkgrel=1
+pkgrel=2
 pkgdesc="DragonLauncher: Emulador de compatibilidade para jogos Windows no Arch Linux, com tradução DirectX/OpenGL para hardware limitado."
 arch=('x86_64')
 url="https://github.com/DragonSCPOFICIAL/DragonLauncher"
 license=('GPL3')
 depends=('wine' 'zenity' 'bash')
 makedepends=('git')
-source=("$pkgname-$pkgver.tar.gz::https://github.com/DragonSCPOFICIAL/DragonLauncher/archive/refs/heads/main.tar.gz")
+# Usando fontes locais para evitar problemas de download e diretórios src/
+source=("git+https://github.com/DragonSCPOFICIAL/DragonLauncher.git")
 sha256sums=('SKIP')
 
+pkgver() {
+  cd "$pkgname"
+  git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g' || echo "1.0.0"
+}
+
 build() {
-  cd "$srcdir/DragonLauncher-main"
+  # No build step needed for this script-based launcher
+  true
 }
 
 package() {
-  cd "$srcdir/DragonLauncher-main"
+  cd "$srcdir/DragonLauncher"
   
   # Criar diretório de instalação
   install -d "$pkgdir/opt/$pkgname"
@@ -30,7 +37,9 @@ package() {
   
   # Copiar configurações
   install -d "$pkgdir/opt/$pkgname/configs"
-  install -m644 "configs/"* "$pkgdir/opt/$pkgname/configs/" 2>/dev/null || true
+  if [ -d "configs" ]; then
+    cp -r configs/* "$pkgdir/opt/$pkgname/configs/"
+  fi
   
   # Copiar arquivos binários
   if [ -d "bin" ]; then
@@ -44,17 +53,15 @@ package() {
   # Criar diretório para prefixo isolado
   install -d "$pkgdir/opt/$pkgname/prefixo_isolado"
   
-  # Criar link simbólico para o executável principal em /usr/local/bin
-  install -d "$pkgdir/usr/local/bin"
-  ln -s "/opt/$pkgname/DragonLauncher.sh" "$pkgdir/usr/local/bin/dragonlauncher"
+  # Criar link simbólico para o executável principal
+  install -d "$pkgdir/usr/bin"
+  ln -s "/opt/$pkgname/DragonLauncher.sh" "$pkgdir/usr/bin/dragonlauncher"
   
-  # Instalar o arquivo .desktop no diretório de aplicações
+  # Instalar o arquivo .desktop
   install -d "$pkgdir/usr/share/applications"
   install -m644 "DragonLauncher.desktop" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
   
-  # Atualizar o arquivo .desktop para apontar para o novo local
+  # Ajustar caminhos no .desktop
+  sed -i "s|Exec=.*|Exec=/usr/bin/dragonlauncher|" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
   sed -i "s|Path=.*|Path=/opt/$pkgname|" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
-  sed -i "s|Exec=.*|Exec=/usr/local/bin/dragonlauncher|" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
-  sed -i "s|Name=.*|Name=DragonLauncher|" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
-  sed -i "s|Comment=.*|Comment=Emulador de compatibilidade para jogos Windows|" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
 }
