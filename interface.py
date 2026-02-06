@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import os
+import json
+import urllib.request
+import threading
 
 class DragonLauncherUI:
     def __init__(self, root):
@@ -54,8 +57,16 @@ class DragonLauncherUI:
         self.start_button = ttk.Button(main_frame, text="LANCAR JOGO", style="Action.TButton", command=self.launch)
         self.start_button.pack(fill=tk.X, ipady=5)
         
+        # Botão de Atualização
+        self.update_button = ttk.Button(main_frame, text="Verificar Atualizações", command=self.check_updates)
+        self.update_button.pack(fill=tk.X, pady=(10, 0))
+        
         # Rodapé
-        ttk.Label(main_frame, text="Mantenedor: DragonSCPOFICIAL", font=('Segoe UI', 8), foreground="#7f8c8d").pack(side=tk.BOTTOM, pady=(10, 0))
+        self.footer_label = ttk.Label(main_frame, text="Mantenedor: DragonSCPOFICIAL", font=('Segoe UI', 8), foreground="#7f8c8d")
+        self.footer_label.pack(side=tk.BOTTOM, pady=(10, 0))
+        
+        # Verificar atualizações em segundo plano ao iniciar
+        threading.Thread(target=self.silent_update_check, daemon=True).start()
 
     def browse_game(self):
         # Define a pasta padrão como Downloads do usuário
@@ -83,6 +94,86 @@ class DragonLauncherUI:
         print(f"GAME_PATH={game}")
         print(f"CHOICE={translator}")
         self.root.destroy()
+    
+    def get_version_info(self):
+        """Obtém informações de versão local"""
+        try:
+            base_dir = "/opt/dragonlauncher"
+            if not os.path.exists(base_dir):
+                base_dir = os.path.dirname(os.path.abspath(__file__))
+            
+            version_file = os.path.join(base_dir, "version.json")
+            if os.path.exists(version_file):
+                with open(version_file, 'r') as f:
+                    return json.load(f)
+            return {"version": "1.0.0", "build": 13}
+        except:
+            return {"version": "1.0.0", "build": 13}
+    
+    def get_remote_version(self):
+        """Obtém versão disponível no GitHub"""
+        try:
+            url = "https://raw.githubusercontent.com/DragonSCPOFICIAL/DragonLauncher/main/version.json"
+            with urllib.request.urlopen(url, timeout=5) as response:
+                return json.load(response)
+        except:
+            return None
+    
+    def silent_update_check(self):
+        """Verifica atualizações silenciosamente ao iniciar"""
+        try:
+            local_info = self.get_version_info()
+            remote_info = self.get_remote_version()
+            
+            if remote_info and remote_info.get('build', 0) > local_info.get('build', 0):
+                # Atualizar rodapé para indicar atualização disponível
+                self.root.after(0, lambda: self.footer_label.config(
+                    text=f"Nova versão disponível: {remote_info.get('version')} - Clique em 'Verificar Atualizações'",
+                    foreground="#e74c3c"
+                ))
+        except:
+            pass
+    
+    def check_updates(self):
+        """Verifica e instala atualizações"""
+        try:
+            local_info = self.get_version_info()
+            remote_info = self.get_remote_version()
+            
+            if not remote_info:
+                messagebox.showwarning("Atualização", "Não foi possível verificar atualizações.\nVerifique sua conexão com a internet.")
+                return
+            
+            local_build = local_info.get('build', 0)
+            remote_build = remote_info.get('build', 0)
+            
+            if remote_build <= local_build:
+                messagebox.showinfo("Atualização", f"Você já está usando a versão mais recente!\n\nVersão atual: {local_info.get('version')} (build {local_build})")
+                return
+            
+            # Mostrar changelog
+            changelog = "\n".join([f"• {item}" for item in remote_info.get('changelog', [])])
+            message = f"Nova versão disponível!\n\nVersão atual: {local_info.get('version')} (build {local_build})\nNova versão: {remote_info.get('version')} (build {remote_build})\n\nNovidades:\n{changelog}\n\nDeseja atualizar agora?"
+            
+            if messagebox.askyesno("Atualização Disponível", message):
+                # Executar o updater
+                import subprocess
+                base_dir = "/opt/dragonlauncher"
+                if not os.path.exists(base_dir):
+                    base_dir = os.path.dirname(os.path.abspath(__file__))
+                
+                updater_path = os.path.join(base_dir, "updater.py")
+                
+                if os.path.exists(updater_path):
+                    # Abrir terminal para executar o updater
+                    terminal_cmd = f"x-terminal-emulator -e 'python3 {updater_path} --auto; echo; echo Pressione Enter para fechar...; read'"
+                    subprocess.Popen(terminal_cmd, shell=True)
+                    messagebox.showinfo("Atualização", "O processo de atualização foi iniciado em uma nova janela.\n\nO DragonLauncher será fechado agora.")
+                    self.root.destroy()
+                else:
+                    messagebox.showerror("Erro", "Script de atualização não encontrado.\n\nPor favor, atualize manualmente com:\ncd ~/DragonLauncher && git pull && makepkg -si")
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao verificar atualizações:\n{str(e)}")
 
 if __name__ == "__main__":
     root = tk.Tk()

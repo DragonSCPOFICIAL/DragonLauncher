@@ -12,9 +12,21 @@ O DragonLauncher e uma solucao otimizada para rodar jogos Windows no Arch Linux,
 git clone https://github.com/DragonSCPOFICIAL/DragonLauncher.git && cd DragonLauncher && makepkg -si
 ```
 
-### Reinstalacao Limpa ou Atualizacao
+### Atualização Automática (Recomendado)
+Abra o DragonLauncher e clique no botão "Verificar Atualizações". O sistema irá automaticamente:
+- Verificar se há novas versões disponíveis
+- Mostrar as novidades (changelog)
+- Baixar e instalar a atualização
+- Criar backup da versão anterior
+
+### Atualização Manual via Terminal
 ```bash
 cd ~/DragonLauncher && git pull && makepkg -si --noconfirm
+```
+
+Ou execute o script de atualização:
+```bash
+/opt/dragonlauncher/update.sh
 ```
 
 ---
@@ -29,11 +41,14 @@ cd ~/DragonLauncher && git pull && makepkg -si --noconfirm
 ---
 
 ## Melhorias Recentes
-- Interface grafica dedicada em Python/Tkinter.
-- Explorador de arquivos inicia na pasta Downloads.
-- Verificacao automatica de dependencias.
-- Sistema de logs em ~/.dragonlauncher.log.
-- Instalacao automatizada de binarios via PKGBUILD.
+- **Sistema de atualização automática integrado** - Verifica e instala atualizações diretamente do GitHub
+- **Verificação de versão em segundo plano** - Notifica quando há novas versões disponíveis
+- **Botão de atualização na interface** - Atualização com um clique
+- Interface gráfica dedicada em Python/Tkinter
+- Explorador de arquivos inicia na pasta Downloads
+- Verificação automática de dependências
+- Sistema de logs em ~/.dragonlauncher.log
+- Instalação automatizada de binários via PKGBUILD
 
 ---
 
