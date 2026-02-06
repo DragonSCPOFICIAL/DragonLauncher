@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=DragonLauncher DXGL
 Comment=Emulador de compatibilidade para jogos Windows (Mesa3D/dgVoodoo2)
-Exec=/usr/bin/dragonlauncher
+Exec=/bin/bash /usr/bin/dragonlauncher
 Icon=system-run
 Terminal=false
 Type=Application
