@@ -1,12 +1,14 @@
 {
-  "version": "1.1.4",
-  "build": 21,
+  "version": "1.1.5",
+  "build": 22,
   "release_date": "2026-02-06",
   "update_check_url": "https://raw.githubusercontent.com/DragonSCPOFICIAL/DragonLauncher/main/version.json",
   "changelog": [
-    "Explorador de arquivos agora abre diretamente na pasta Downloads",
-    "Melhoria na usabilidade ao adicionar novos jogos",
-    "Sincronização de build para o novo sistema de atualização Raw"
+    "MOTOR DE ATUALIZAÇÃO 2.0: Refatoração completa para máxima resiliência",
+    "Correção de permissões ao atualizar arquivos em /opt",
+    "Sistema de arquivos temporários para evitar corrupção em downloads",
+    "Feedback visual detalhado no terminal durante a atualização",
+    "Sincronização total de todos os scripts do repositório via Raw"
   ],
   "download_url": "https://raw.githubusercontent.com/DragonSCPOFICIAL/DragonLauncher/main/",
   "min_version": "1.0.0"
