@@ -10,6 +10,12 @@ echo "--- Iniciando DragonLauncher em $(date) ---" > "$LOG_FILE"
 # Redirecionar saída para o log e para o terminal (se houver)
 exec > >(tee -a "$LOG_FILE") 2>&1
 
+# Verificar se o zenity funciona (necessário para a interface)
+if ! command -v zenity &> /dev/null; then
+    echo "ERRO: Zenity não instalado. O programa precisa dele para a interface."
+    exit 1
+fi
+
 # --- Configurações de Caminho ---
 # Resolve o caminho real se for um link simbólico
 SCRIPT_PATH=$(readlink -f "$0")

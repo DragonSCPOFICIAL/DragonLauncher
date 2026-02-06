@@ -1,7 +1,7 @@
 # Maintainer: DragonSCPOFICIAL <dragon@dragonhub.com>
 pkgname=dragonlauncher
 pkgver=1.0.0
-pkgrel=5
+pkgrel=6
 pkgdesc="DragonLauncher: Emulador de compatibilidade para jogos Windows no Arch Linux, com tradução DirectX/OpenGL para hardware limitado."
 arch=('x86_64')
 url="https://github.com/DragonSCPOFICIAL/DragonLauncher"
@@ -54,10 +54,15 @@ package() {
   # Criar link simbólico para o executável
   ln -sf "/opt/$pkgname/DragonLauncher.sh" "$pkgdir/usr/bin/dragonlauncher"
   
+  # Forçar permissões totais em /opt/dragonlauncher para evitar bloqueios
+  chmod -R 777 "$pkgdir/opt/$pkgname"
+  chmod +x "$pkgdir/opt/$pkgname/DragonLauncher.sh"
+
   # Instalar e configurar o arquivo .desktop
   if [ -f "DragonLauncher.desktop" ]; then
     install -m644 "DragonLauncher.desktop" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
-    sed -i "s|Exec=.*|Exec=/usr/bin/dragonlauncher|" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
+    # Garantir que o Exec use o bash explicitamente e aponte para o caminho correto
+    sed -i "s|Exec=.*|Exec=/bin/bash /usr/bin/dragonlauncher|" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
     sed -i "s|Path=.*|Path=/opt/$pkgname|" "$pkgdir/usr/share/applications/dragonlauncher.desktop"
   fi
 }
