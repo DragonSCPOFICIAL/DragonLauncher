@@ -24,7 +24,9 @@ class DragonLauncherUI:
         
         self.config_dir = os.path.expanduser("~/.config/dragonlauncher")
         self.profiles_file = os.path.join(self.config_dir, "profiles.json")
+        self.icons_dir = os.path.join(self.config_dir, "icons")
         os.makedirs(self.config_dir, exist_ok=True)
+        os.makedirs(self.icons_dir, exist_ok=True)
         
         # Estilo
         self.setup_styles()
@@ -32,6 +34,7 @@ class DragonLauncherUI:
         # Dados
         self.profiles = self.load_profiles()
         self.translators_32, self.translators_64 = self.detect_translators_by_arch()
+        self.image_cache = {} # Cache para imagens do Tkinter
         
         # Layout
         self.setup_ui()
@@ -67,7 +70,7 @@ class DragonLauncherUI:
         ttk.Button(self.sidebar, text="Atualizações", command=self.check_updates).pack(fill=tk.X, padx=10, pady=5)
         ttk.Button(self.sidebar, text="Desinstalar", command=self.uninstall_app).pack(fill=tk.X, padx=10, pady=5)
         
-        self.footer_info = ttk.Label(self.sidebar, text="v1.1.6", foreground="#bdc3c7", background="#2c3e50", font=('Segoe UI', 8))
+        self.footer_info = ttk.Label(self.sidebar, text="v1.2.0", foreground="#bdc3c7", background="#2c3e50", font=('Segoe UI', 8))
         self.footer_info.pack(side=tk.BOTTOM, pady=10)
         
         # Área de Conteúdo (Direita)
@@ -112,9 +115,38 @@ class DragonLauncherUI:
                 col = 0
                 row += 1
 
+    def get_game_icon(self, game_id, game_path):
+        """Tenta carregar o ícone do jogo ou usa um padrão"""
+        icon_path = os.path.join(self.icons_dir, f"{game_id}.png")
+        
+        # Se não existe ícone extraído, tenta extrair (simulado por enquanto ou usa placeholder)
+        if not os.path.exists(icon_path):
+            # Aqui poderíamos usar ferramentas como 'wrestool' para extrair ícones reais de .exe
+            # Por enquanto, vamos usar um ícone padrão bonito
+            pass
+            
+        try:
+            if os.path.exists(icon_path):
+                img = Image.open(icon_path)
+            else:
+                # Placeholder: Um ícone de controle de videogame genérico
+                img = Image.new('RGB', (100, 100), color = (44, 62, 80))
+            
+            img = img.resize((120, 120), Image.Resampling.LANCZOS)
+            return ImageTk.PhotoImage(img)
+        except:
+            return None
+
     def create_game_card(self, parent, game_id, data, row, col):
         card = tk.Frame(parent, bg="white", padx=10, pady=10, highlightbackground="#ddd", highlightthickness=1)
         card.grid(row=row, column=col, padx=10, pady=10, sticky="nsew")
+        
+        # Imagem do Jogo
+        photo = self.get_game_icon(game_id, data.get('path'))
+        if photo:
+            self.image_cache[game_id] = photo # Manter referência
+            img_label = tk.Label(card, image=photo, bg="white")
+            img_label.pack(pady=5)
         
         # Nome do Jogo
         name = data.get('name', 'Jogo Desconhecido')
@@ -135,9 +167,9 @@ class DragonLauncherUI:
         tk.Button(btn_frame, text="X", bg="#c0392b", fg="white", font=('Segoe UI', 9), 
                   command=lambda: self.remove_game(game_id), relief="flat", padx=5).pack(side=tk.LEFT, padx=2)
 
-    def add_game_dialog(self):
+    def add_game_dialog(self, edit_id=None):
         self.game_window = tk.Toplevel(self.root)
-        self.game_window.title("Adicionar Novo Jogo")
+        self.game_window.title("Adicionar Novo Jogo" if not edit_id else "Editar Jogo")
         self.game_window.geometry("500x450")
         self.game_window.resizable(False, False)
         self.game_window.transient(self.root)
@@ -146,14 +178,18 @@ class DragonLauncherUI:
         frame = ttk.Frame(self.game_window, padding=20)
         frame.pack(fill=tk.BOTH, expand=True)
         
+        data = self.profiles.get(edit_id, {}) if edit_id else {}
+        
         ttk.Label(frame, text="Nome do Jogo:").pack(anchor=tk.W)
         name_entry = ttk.Entry(frame)
+        name_entry.insert(0, data.get('name', ''))
         name_entry.pack(fill=tk.X, pady=(5, 15))
         
         ttk.Label(frame, text="Executável (.exe):").pack(anchor=tk.W)
         path_frame = ttk.Frame(frame)
         path_frame.pack(fill=tk.X, pady=(5, 15))
         path_entry = ttk.Entry(path_frame)
+        path_entry.insert(0, data.get('path', ''))
         path_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
         
         def browse():
@@ -174,12 +210,12 @@ class DragonLauncherUI:
         ttk.Button(path_frame, text="...", width=3, command=browse).pack(side=tk.RIGHT)
         
         ttk.Label(frame, text="Categoria do Tradutor:").pack(anchor=tk.W)
-        cat_var = tk.StringVar(value="64 bits")
+        cat_var = tk.StringVar(value=data.get('arch', '64 bits'))
         cat_combo = ttk.Combobox(frame, textvariable=cat_var, values=["32 bits", "64 bits"], state="readonly")
         cat_combo.pack(fill=tk.X, pady=(5, 10))
         
         ttk.Label(frame, text="Escolha o Tradutor:").pack(anchor=tk.W)
-        trans_var = tk.StringVar()
+        trans_var = tk.StringVar(value=data.get('translator', ''))
         trans_combo = ttk.Combobox(frame, textvariable=trans_var, state="readonly")
         trans_combo.pack(fill=tk.X, pady=(5, 20))
         
@@ -188,7 +224,8 @@ class DragonLauncherUI:
                 trans_combo['values'] = self.translators_32
             else:
                 trans_combo['values'] = self.translators_64
-            if trans_combo['values']: trans_combo.current(0)
+            if not trans_var.get() and trans_combo['values']: 
+                trans_combo.current(0)
             
         cat_var.trace('w', update_translators)
         update_translators()
@@ -198,7 +235,7 @@ class DragonLauncherUI:
             path = path_entry.get()
             trans = trans_var.get()
             if name and path and trans:
-                game_id = str(hash(path))
+                game_id = edit_id if edit_id else str(hash(path))
                 self.profiles[game_id] = {
                     "name": name,
                     "path": path,
@@ -214,9 +251,7 @@ class DragonLauncherUI:
         ttk.Button(frame, text="SALVAR JOGO", style="Action.TButton", command=save).pack(fill=tk.X, pady=10)
 
     def edit_game_dialog(self, game_id):
-        data = self.profiles[game_id]
-        self.add_game_dialog()
-        self.game_window.title(f"Editar: {data['name']}")
+        self.add_game_dialog(edit_id=game_id)
 
     def remove_game(self, game_id):
         if messagebox.askyesno("Confirmar", "Remover este jogo da biblioteca?"):
@@ -225,10 +260,13 @@ class DragonLauncherUI:
             self.show_library()
 
     def launch_game(self, game_id):
+        """Prepara as variáveis e fecha a interface para o script Bash assumir"""
         data = self.profiles[game_id]
-        print(f"GAME_PATH={data['path']}")
-        print(f"CHOICE={data['translator']}")
-        print(f"ARCH={data['arch'].replace(' bits', '').replace('x', '')}")
+        # IMPORTANTE: Imprimir as variáveis que o DragonLauncher.sh vai capturar via eval
+        print(f"GAME_PATH='{data['path']}'")
+        print(f"CHOICE='{data['translator']}'")
+        arch_val = data['arch'].replace(' bits', '').replace('x', '')
+        print(f"ARCH='{arch_val}'")
         self.root.destroy()
 
     def detect_translators_by_arch(self):
@@ -268,9 +306,9 @@ class DragonLauncherUI:
             if os.path.exists(version_file):
                 with open(version_file, 'r') as f:
                     return json.load(f)
-            return {"version": "1.1.5", "build": 22}
+            return {"version": "1.1.6", "build": 23}
         except:
-            return {"version": "1.1.5", "build": 22}
+            return {"version": "1.1.6", "build": 23}
 
     def get_remote_version(self):
         try:
