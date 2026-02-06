@@ -1,9 +1,0 @@
-cd ~/Desktop/Testador_DXGL
-
-(Se o seu sistema estiver em português, pode ser
- cd ~/Área\ de\ Trabalho/Testador_DXGL)
-
-chmod +x DragonLauncher.sh
-
-
-./DragonLauncher.sh
