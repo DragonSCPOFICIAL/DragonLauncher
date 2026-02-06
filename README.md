@@ -5,27 +5,25 @@ O **DragonLauncher** é uma solução otimizada para rodar jogos Windows no Arch
 
 ---
 
-## 🚀 Instalação e Atualização Inteligente
+## 🚀 Instalação e Atualização
 
 ### 📥 Primeira Instalação
-Se você está instalando pela primeira vez, use este comando:
+Se você está instalando pela primeira vez:
 ```bash
 git clone https://github.com/DragonSCPOFICIAL/DragonLauncher.git && cd DragonLauncher && makepkg -si
 ```
 
-### 🔄 Atualizar (Sem deletar nada)
-Se você já tem o DragonLauncher e quer apenas baixar as novidades e atualizar o sistema, use este comando de dentro da pasta:
+### 🔄 Reinstalação Limpa (Recomendado se houver erros)
+Se o programa já está instalado e você quer **remover tudo e reinstalar do zero** a versão mais recente e corrigida:
+```bash
+sudo pacman -R dragonlauncher --noconfirm; git pull; makepkg -si
+```
+*Este comando remove a versão antiga do sistema, baixa as correções e instala tudo limpo.*
+
+### ⚡ Atualização Rápida
+Se você quer apenas atualizar os arquivos sem desinstalar:
 ```bash
 git pull && makepkg -si
-```
-*Este comando baixa apenas o que mudou no repositório e reinstala a versão nova, mantendo seus arquivos intactos.*
-
----
-
-## 🧹 Limpeza Total (Apenas se houver erros graves)
-Se algo quebrar e você quiser começar do zero absoluto:
-```bash
-rm -rf DragonLauncher && git clone https://github.com/DragonSCPOFICIAL/DragonLauncher.git && cd DragonLauncher && makepkg -si
 ```
 
 ---
@@ -42,10 +40,10 @@ Após a instalação, o DragonLauncher estará disponível no seu menu de aplica
 ---
 
 ## 🛠️ O que foi corrigido?
-- ✅ **Atualização Rápida:** Agora suporta `git pull` para atualizações sem reinstalação total.
+- ✅ **Reinstalação Limpa:** Adicionado comando para remover a versão antiga antes de instalar.
+- ✅ **Sistema de Logs:** Agora grava erros em `~/.dragonlauncher.log` para facilitar o diagnóstico.
 - ✅ **Erro de Versão:** Corrigido o erro de `pkgver` (agora funciona com ou sem tags Git).
 - ✅ **Arquitetura Automática:** Detecta se o jogo é 32 ou 64 bits.
-- ✅ **Permissões Inteligentes:** Fallback automático para a pasta do usuário se `/opt` estiver bloqueado.
 
 ---
 
