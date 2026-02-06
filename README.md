@@ -23,7 +23,18 @@ cd DragonLauncher
 makepkg -si
 ```
 
-> **Dica:** Se você já tem a pasta clonada, execute `git pull origin master` antes do `makepkg -si` para garantir que está usando a versão corrigida.
+---
+
+## 🔄 Limpeza e Reinstalação (Caso já tenha baixado antes)
+
+Se você já tentou instalar o DragonLauncher anteriormente e encontrou erros, ou se a pasta já existe, use estes comandos para limpar tudo e instalar a versão corrigida do zero:
+
+```bash
+rm -rf DragonLauncher
+git clone https://github.com/DragonSCPOFICIAL/DragonLauncher.git
+cd DragonLauncher
+makepkg -si
+```
 
 ---
 
