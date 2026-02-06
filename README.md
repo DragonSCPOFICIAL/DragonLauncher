@@ -16,9 +16,9 @@ git clone https://github.com/DragonSCPOFICIAL/DragonLauncher.git && cd DragonLau
 ### 🔄 Reinstalação Limpa (Recomendado se houver erros)
 Se o programa já está instalado e você quer **remover tudo e reinstalar do zero** a versão mais recente e corrigida:
 ```bash
-sudo pacman -R dragonlauncher --noconfirm; git pull; makepkg -si
+sudo pacman -R dragonlauncher --noconfirm; cd ~/DragonLauncher || (git clone https://github.com/DragonSCPOFICIAL/DragonLauncher.git ~/DragonLauncher && cd ~/DragonLauncher); git pull; makepkg -si
 ```
-*Este comando remove a versão antiga do sistema, baixa as correções e instala tudo limpo.*
+*Este comando remove a versão antiga do sistema, garante que você está na pasta correta, baixa as correções e instala tudo limpo.*
 
 ### ⚡ Atualização Rápida
 Se você quer apenas atualizar os arquivos sem desinstalar:
