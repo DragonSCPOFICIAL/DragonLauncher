@@ -1,6 +1,6 @@
 # Maintainer: DragonSCPOFICIAL <dragon@dragonhub.com>
 pkgname=dragonlauncher
-pkgver=1.0.1
+pkgver=1.0.2
 pkgrel=1
 pkgdesc="DragonLauncher: Emulador de compatibilidade para jogos Windows no Arch Linux com interface dedicada e sistema de atualização automática."
 arch=('x86_64')
@@ -28,6 +28,9 @@ package() {
   
   chmod -R 777 "$pkgdir/opt/$pkgname"
   chmod +x "$pkgdir/opt/$pkgname/DragonLauncher.sh"
+  chmod +x "$pkgdir/opt/$pkgname/uninstall.sh"
+  chmod +x "$pkgdir/opt/$pkgname/update.sh"
+  chmod +x "$pkgdir/opt/$pkgname/updater.py"
   
   ln -sf "/opt/$pkgname/DragonLauncher.sh" "$pkgdir/usr/bin/dragonlauncher"
   

@@ -19,6 +19,19 @@ Abra o DragonLauncher e clique no botão "Verificar Atualizações". O sistema i
 - Baixar e instalar a atualização
 - Criar backup da versão anterior
 
+### At### Instalação Manual (Sem makepkg)
+Se você não quiser usar o `makepkg`, pode instalar manualmente:
+```bash
+cd ~/DragonLauncher
+sudo ./install.sh
+```
+
+### Desinstalação Completa
+Para remover o DragonLauncher e todos os seus arquivos do sistema:
+```bash
+# Via Interface: Clique no botão "Desinstalar DragonLauncher"
+# Ou via Terminal:
+sudo /opt/dragonlauncher/uninstall.sh
 ### Atualização Manual via Terminal
 ```bash
 cd ~/DragonLauncher && git pull && makepkg -si --noconfirm
@@ -29,6 +42,40 @@ Ou execute o script de atualização:
 /opt/dragonlauncher/update.sh
 ```
 
+---
+
+## 🛠️ Instalação e Remoção Manual (Avançado)
+
+Se você preferir não usar o `makepkg` ou precisar remover tudo manualmente, use os comandos abaixo:
+
+### Instalação Manual
+```bash
+cd ~/DragonLauncher
+sudo ./install.sh
+```
+
+### Remoção Completa (Desinstalar)
+Para apagar o programa, os atalhos, os logs e todos os arquivos baixados:
+```bash
+sudo /opt/dragonlauncher/uninstall.sh
+```
+
+**O que o desinstalador remove:**
+- ✅ O diretório do programa em `/opt/dragonlauncher`
+- ✅ O atalho no terminal em `/usr/bin/dragonlauncher`
+- ✅ O ícone no menu de aplicativos
+- ✅ Todos os logs em `~/.dragonlauncher.log`
+- ✅ Backups e arquivos temporários de atualização
+- ✅ (Opcional) O prefixo do Wine com seus jogos instalados
+
+### Comando de "Limpeza Total" (Manual)
+Se você quiser apagar tudo sem usar o script, execute:
+```bash
+sudo rm -rf /opt/dragonlauncher
+sudo rm -f /usr/bin/dragonlauncher
+sudo rm -f /usr/share/applications/dragonlauncher.desktop
+rm -rf ~/.dragonlauncher_prefix ~/.dragonlauncher_backup ~/.dragonlauncher.log
+```
 ---
 
 ## Como Usar

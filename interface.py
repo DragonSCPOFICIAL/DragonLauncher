@@ -61,6 +61,10 @@ class DragonLauncherUI:
         self.update_button = ttk.Button(main_frame, text="Verificar Atualizações", command=self.check_updates)
         self.update_button.pack(fill=tk.X, pady=(10, 0))
         
+        # Botão de Desinstalação
+        self.uninstall_button = ttk.Button(main_frame, text="Desinstalar DragonLauncher", command=self.uninstall_app)
+        self.uninstall_button.pack(fill=tk.X, pady=(5, 0))
+        
         # Rodapé
         self.footer_label = ttk.Label(main_frame, text="Mantenedor: DragonSCPOFICIAL", font=('Segoe UI', 8), foreground="#7f8c8d")
         self.footer_label.pack(side=tk.BOTTOM, pady=(10, 0))
@@ -174,6 +178,24 @@ class DragonLauncherUI:
                     messagebox.showerror("Erro", "Script de atualização não encontrado.\n\nPor favor, atualize manualmente com:\ncd ~/DragonLauncher && git pull && makepkg -si")
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao verificar atualizações:\n{str(e)}")
+            
+    def uninstall_app(self):
+        """Chama o script de desinstalação"""
+        if messagebox.askyesno("Desinstalar", "Tem certeza que deseja remover o DragonLauncher do sistema?\n\nIsso fechará o programa agora."):
+            import subprocess
+            base_dir = "/opt/dragonlauncher"
+            if not os.path.exists(base_dir):
+                base_dir = os.path.dirname(os.path.abspath(__file__))
+            
+            uninstall_path = os.path.join(base_dir, "uninstall.sh")
+            
+            if os.path.exists(uninstall_path):
+                # Abrir terminal para executar o desinstalador
+                terminal_cmd = f"x-terminal-emulator -e 'bash {uninstall_path}; echo; echo Pressione Enter para fechar...; read'"
+                subprocess.Popen(terminal_cmd, shell=True)
+                self.root.destroy()
+            else:
+                messagebox.showerror("Erro", "Script de desinstalação não encontrado em:\n" + uninstall_path)
 
 if __name__ == "__main__":
     root = tk.Tk()
