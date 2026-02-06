@@ -1,14 +1,13 @@
 {
-  "version": "1.0.2",
-  "build": 15,
+  "version": "1.0.3",
+  "build": 16,
   "release_date": "2026-02-06",
   "update_check_url": "https://raw.githubusercontent.com/DragonSCPOFICIAL/DragonLauncher/main/version.json",
   "changelog": [
-    "Sistema de atualização automática implementado",
-    "Verificação de novas versões via GitHub",
-    "Download e instalação automática de atualizações",
-    "Script de desinstalação completa (uninstall.sh) adicionado",
-    "Botão de desinstalação integrado na interface gráfica"
+    "Interface gráfica redimensionada (550x550) para melhor visibilidade",
+    "Detecção dinâmica de tradutores nas pastas bin/x32 e bin/x64",
+    "Melhorias estéticas na disposição dos botões",
+    "Correção do botão de desinstalação que ficava cortado"
   ],
   "download_url": "https://github.com/DragonSCPOFICIAL/DragonLauncher/releases/latest/download/dragonlauncher-update.tar.gz",
   "min_version": "1.0.0"
