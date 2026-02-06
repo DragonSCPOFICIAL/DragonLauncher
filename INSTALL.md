@@ -33,14 +33,16 @@ Use o `makepkg` para construir e instalar o pacote:
 makepkg -si
 ```
 
+> **Nota Importante:** Se você já tiver o repositório clonado e quiser atualizar para a versão mais recente com as correções, execute `git pull origin master` antes do `makepkg -si`.
+
 O comando acima irá:
 - Instalar as dependências automaticamente (flag `-s`)
-- Construir o pacote
+- Construir o pacote usando os arquivos locais
 - Instalar o DragonLauncher como um programa no seu sistema (flag `-i`)
 
 ### Passo 3: Verificar a Instalação
 
-Após a conclusão, o DragonLauncher estará instalado em `/opt/dragonlauncher` e um link simbólico será criado em `/usr/local/bin/dragonlauncher`. Você pode verificar a instalação executando:
+Após a conclusão, o DragonLauncher estará instalado em `/opt/dragonlauncher` e um link simbólico será criado em `/usr/bin/dragonlauncher`. Você pode verificar a instalação executando:
 
 ```bash
 dragonlauncher

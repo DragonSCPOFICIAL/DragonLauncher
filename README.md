@@ -21,7 +21,7 @@ Uma das principais inovações do DragonLauncher é sua capacidade de otimizar a
 Para utilizar o DragonLauncher, você precisará ter os seguintes pacotes instalados no seu Arch Linux:
 
 ```bash
-sudo pacman -S wine zenity
+sudo pacman -S wine zenity git
 ```
 
 ## Instalação (Estilo AUR)
@@ -39,9 +39,11 @@ cd DragonLauncher
 makepkg -si
 ```
 
+> **Dica:** Se você já clonou o repositório anteriormente, execute `git pull origin master` antes de rodar o `makepkg -si` para garantir que está usando a versão corrigida.
+
 O comando acima irá:
 - Baixar as dependências necessárias
-- Construir o pacote
+- Construir o pacote usando os arquivos locais
 - Instalar o DragonLauncher como um programa no seu sistema Arch Linux
 
 ## Como Usar
@@ -56,7 +58,7 @@ dragonlauncher
 
 ### Pelo Menu de Aplicações
 
-Procure por "DragonLauncher DXGL" no seu menu de aplicações (KDE Plasma, GNOME, etc.) e clique para executá-lo.
+Procure por "DragonLauncher" no seu menu de aplicações (KDE Plasma, GNOME, etc.) e clique para executá-lo.
 
 ## Fluxo de Uso
 
@@ -75,7 +77,7 @@ Procure por "DragonLauncher DXGL" no seu menu de aplicações (KDE Plasma, GNOME
 *   `PKGBUILD`: Arquivo de construção do pacote para Arch Linux
 *   `COMO_USAR.txt`: Instruções básicas de uso
 *   `configs/`: Arquivos de configuração para os tradutores
-*   `prefixo_isolado/`: Diretório onde o `WINEPREFIX` isolado é criado
+*   `bin/`: Bibliotecas de tradução (DLLs) para x32 e x64
 
 ## Compatibilidade
 
