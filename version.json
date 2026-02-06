@@ -1,14 +1,13 @@
 {
-  "version": "1.1.5",
-  "build": 22,
+  "version": "1.1.6",
+  "build": 23,
   "release_date": "2026-02-06",
   "update_check_url": "https://raw.githubusercontent.com/DragonSCPOFICIAL/DragonLauncher/main/version.json",
   "changelog": [
-    "MOTOR DE ATUALIZAÇÃO 2.0: Refatoração completa para máxima resiliência",
-    "Correção de permissões ao atualizar arquivos em /opt",
-    "Sistema de arquivos temporários para evitar corrupção em downloads",
-    "Feedback visual detalhado no terminal durante a atualização",
-    "Sincronização total de todos os scripts do repositório via Raw"
+    "CORREÇÃO CRÍTICA: Desinstalação agora funciona corretamente com privilégios sudo",
+    "Melhoria na chamada do atualizador para garantir abertura do terminal",
+    "Refatoração do uninstall.sh para limpeza total do sistema e configurações",
+    "Suporte a múltiplos emuladores de terminal (GNOME, KDE, XFCE, etc.)"
   ],
   "download_url": "https://raw.githubusercontent.com/DragonSCPOFICIAL/DragonLauncher/main/",
   "min_version": "1.0.0"

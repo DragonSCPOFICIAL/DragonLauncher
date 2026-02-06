@@ -6,6 +6,7 @@ import urllib.request
 import threading
 import subprocess
 import ssl
+import shutil
 from pathlib import Path
 from PIL import Image, ImageTk
 
@@ -66,7 +67,7 @@ class DragonLauncherUI:
         ttk.Button(self.sidebar, text="Atualizações", command=self.check_updates).pack(fill=tk.X, padx=10, pady=5)
         ttk.Button(self.sidebar, text="Desinstalar", command=self.uninstall_app).pack(fill=tk.X, padx=10, pady=5)
         
-        self.footer_info = ttk.Label(self.sidebar, text="v1.1.2", foreground="#bdc3c7", background="#2c3e50", font=('Segoe UI', 8))
+        self.footer_info = ttk.Label(self.sidebar, text="v1.1.6", foreground="#bdc3c7", background="#2c3e50", font=('Segoe UI', 8))
         self.footer_info.pack(side=tk.BOTTOM, pady=10)
         
         # Área de Conteúdo (Direita)
@@ -267,9 +268,9 @@ class DragonLauncherUI:
             if os.path.exists(version_file):
                 with open(version_file, 'r') as f:
                     return json.load(f)
-            return {"version": "1.1.1", "build": 19}
+            return {"version": "1.1.5", "build": 22}
         except:
-            return {"version": "1.1.1", "build": 19}
+            return {"version": "1.1.5", "build": 22}
 
     def get_remote_version(self):
         try:
@@ -288,7 +289,7 @@ class DragonLauncherUI:
             self.root.after(0, lambda: self.footer_info.config(text="Nova versão disponível!", foreground="#e74c3c"))
 
     def check_updates(self):
-        """Verifica e executa a atualização usando o novo sistema Raw"""
+        """Verifica e executa a atualização usando o novo sistema Raw 2.0"""
         try:
             local_info = self.get_version_info()
             remote_info = self.get_remote_version()
@@ -307,15 +308,38 @@ class DragonLauncherUI:
             changelog = "\n".join([f"• {item}" for item in remote_info.get('changelog', [])])
             if messagebox.askyesno("Nova Versão", f"Build {remote_build} disponível!\n\nNovidades:\n{changelog}\n\nAtualizar agora?"):
                 updater_path = os.path.join(self.base_dir, "updater.py")
-                cmd = f"x-terminal-emulator -e 'sudo python3 {updater_path}; echo; echo Pressione Enter para fechar...; read'"
-                subprocess.Popen(cmd, shell=True)
+                terminals = ["x-terminal-emulator", "gnome-terminal", "konsole", "xfce4-terminal", "xterm"]
+                cmd_found = False
+                for term in terminals:
+                    if shutil.which(term):
+                        cmd = f"{term} -e 'sudo python3 {updater_path}'"
+                        subprocess.Popen(cmd, shell=True)
+                        cmd_found = True
+                        break
+                
+                if not cmd_found:
+                    subprocess.Popen(f"sudo python3 {updater_path}", shell=True)
+                
                 self.root.destroy()
         except Exception as e:
             messagebox.showerror("Erro", f"Falha na atualização: {e}")
 
     def uninstall_app(self):
-        if messagebox.askyesno("Desinstalar", "Deseja remover o DragonLauncher?"):
-            subprocess.Popen(f"sudo bash {self.base_dir}/uninstall.sh", shell=True)
+        """Chama o desinstalador com privilégios sudo"""
+        if messagebox.askyesno("Desinstalar", "Deseja remover COMPLETAMENTE o DragonLauncher do sistema?\n\nIsso fechará o programa agora."):
+            uninstall_path = os.path.join(self.base_dir, "uninstall.sh")
+            terminals = ["x-terminal-emulator", "gnome-terminal", "konsole", "xfce4-terminal", "xterm"]
+            cmd_found = False
+            for term in terminals:
+                if shutil.which(term):
+                    cmd = f"{term} -e 'sudo bash {uninstall_path}'"
+                    subprocess.Popen(cmd, shell=True)
+                    cmd_found = True
+                    break
+            
+            if not cmd_found:
+                subprocess.Popen(f"sudo bash {uninstall_path}", shell=True)
+                
             self.root.destroy()
 
 if __name__ == "__main__":

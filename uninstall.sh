@@ -1,75 +1,60 @@
 #!/bin/bash
 
-# DragonLauncher - Script de Desinstalação Completa
-# Este script remove todos os arquivos, configurações e binários do sistema.
+# DragonLauncher - Desinstalador Completo
+# Este script remove todos os arquivos do sistema e configurações do usuário.
 
-echo "=========================================="
-echo "   DragonLauncher - Desinstalador"
-echo "=========================================="
-echo ""
+echo "========================================"
+echo "   DRAGON LAUNCHER - DESINSTALADOR      "
+echo "========================================"
 
-# Verificar se o usuário realmente deseja desinstalar
-if [[ "$1" != "--force" ]]; then
-    read -p "Tem certeza que deseja remover COMPLETAMENTE o DragonLauncher? (s/N): " confirm
-    if [[ ! $confirm =~ ^[Ss]$ ]]; then
-        echo "Desinstalação cancelada."
-        exit 0
-    fi
+# Verificar se é root, se não, pedir sudo
+if [ "$EUID" -ne 0 ]; then
+  echo "Por favor, insira sua senha para desinstalar o programa do sistema."
+  sudo "$0" "$@"
+  exit $?
 fi
 
-echo "Iniciando remoção..."
+echo "Iniciando remoção completa..."
 
-# 1. Remover links simbólicos em /usr/bin
-echo "[1/6] Removendo atalhos do sistema..."
-if [ -L "/usr/bin/dragonlauncher" ]; then
-    sudo rm -f "/usr/bin/dragonlauncher"
-    echo "  - /usr/bin/dragonlauncher removido."
-fi
-
-# 2. Remover arquivos de desktop (menu de aplicativos)
-echo "[2/6] Removendo atalhos do menu..."
-if [ -f "/usr/share/applications/dragonlauncher.desktop" ]; then
-    sudo rm -f "/usr/share/applications/dragonlauncher.desktop"
-    echo "  - Atalho do menu removido."
-fi
-
-# 3. Remover diretório principal em /opt
-echo "[3/6] Removendo arquivos do programa (/opt/dragonlauncher)..."
+# 1. Remover diretório principal
 if [ -d "/opt/dragonlauncher" ]; then
-    sudo rm -rf "/opt/dragonlauncher"
-    echo "  - Diretório /opt/dragonlauncher removido."
+    echo "[-] Removendo /opt/dragonlauncher..."
+    rm -rf "/opt/dragonlauncher"
 fi
 
-# 4. Remover arquivos de configuração e logs do usuário
-echo "[4/6] Removendo logs e configurações do usuário..."
-rm -f "$HOME/.dragonlauncher.log"
-rm -f "$HOME/.dragonlauncher_update.log"
-echo "  - Logs removidos."
-
-# 5. Remover backups e arquivos temporários de atualização
-echo "[5/6] Removendo backups e arquivos temporários..."
-rm -rf "$HOME/.dragonlauncher_backup"
-rm -rf "$HOME/.dragonlauncher_update"
-echo "  - Backups e temporários removidos."
-
-# 6. Remover o prefixo do Wine (Opcional)
-echo ""
-if [[ "$1" != "--force" ]]; then
-    read -p "Deseja remover também o prefixo do Wine (~/.dragonlauncher_prefix)? Isso apagará todos os jogos instalados por ele! (s/N): " remove_prefix
-    if [[ $remove_prefix =~ ^[Ss]$ ]]; then
-        echo "[6/6] Removendo prefixo do Wine..."
-        rm -rf "$HOME/.dragonlauncher_prefix"
-        echo "  - Prefixo removido."
-    else
-        echo "[6/6] Prefixo do Wine mantido em $HOME/.dragonlauncher_prefix"
-    fi
-else
-    echo "[6/6] Prefixo do Wine mantido (use remoção manual se desejar apagar os jogos)."
+# 2. Remover binário do sistema
+if [ -f "/usr/bin/dragonlauncher" ]; then
+    echo "[-] Removendo /usr/bin/dragonlauncher..."
+    rm -f "/usr/bin/dragonlauncher"
 fi
 
+# 3. Remover atalho do menu
+if [ -f "/usr/share/applications/DragonLauncher.desktop" ]; then
+    echo "[-] Removendo atalho do menu..."
+    rm -f "/usr/share/applications/DragonLauncher.desktop"
+fi
+
+# 4. Limpar arquivos do usuário (Configurações e Logs)
+# Como estamos como sudo, precisamos pegar o usuário real para limpar a home dele
+REAL_USER=${SUDO_USER:-$USER}
+USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
+
+echo "[-] Limpando configurações do usuário ($REAL_USER)..."
+rm -rf "$USER_HOME/.config/dragonlauncher"
+rm -rf "$USER_HOME/.dragonlauncher_backup"
+rm -rf "$USER_HOME/.dragonlauncher_update"
+rm -f "$USER_HOME/.dragonlauncher.log"
+rm -f "$USER_HOME/.dragonlauncher_update.log"
+
+# 5. Pergunta sobre o Prefixo Wine (Opcional pois contém os jogos)
 echo ""
-echo "=========================================="
-echo "   Desinstalação concluída com sucesso!"
-echo "=========================================="
-echo "O DragonLauncher foi removido do seu sistema."
-echo ""
+read -p "Deseja remover também a pasta de jogos/prefixo Wine? (y/N): " REMOVE_WINE
+if [[ "$REMOVE_WINE" =~ ^[Yy]$ ]]; then
+    echo "[-] Removendo prefixo Wine em $USER_HOME/.dragonlauncher_prefix..."
+    rm -rf "$USER_HOME/.dragonlauncher_prefix"
+fi
+
+echo "----------------------------------------"
+echo "SUCESSO: DragonLauncher foi totalmente removido!"
+echo "Pressione Enter para fechar."
+read
