@@ -18,12 +18,20 @@ Gerenciador de múltiplas instâncias do Roblox para Linux utilizando o Sober (F
 
 ## Como Instalar
 
-1. Abra o terminal na pasta `MultiRoblox-Linux`.
-2. Dê permissão de execução ao instalador:
+1. Abra o seu terminal.
+2. Clone o repositório (se ainda não o tiver):
+   ```bash
+   git clone https://github.com/DragonSCPOFICIAL/DragonLauncher.git
+   ```
+3. Entre na pasta do MultiRoblox:
+   ```bash
+   cd DragonLauncher/MultiRoblox-Linux
+   ```
+4. Dê permissão de execução ao instalador:
    ```bash
    chmod +x instalar_multiroblox.sh
    ```
-3. Execute o script de instalação:
+5. Execute o script de instalação:
    ```bash
    ./instalar_multiroblox.sh
    ```
