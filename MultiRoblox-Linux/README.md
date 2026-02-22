@@ -28,6 +28,24 @@ Gerenciador de múltiplas instâncias do Roblox para Linux utilizando o Sober (F
    ./instalar_multiroblox.sh
    ```
 
+## Como Atualizar
+
+Se você já tem o programa instalado e quer baixar a versão mais recente com as correções de isolamento:
+
+1. Vá para a pasta raiz do repositório:
+   ```bash
+   cd ~/DragonLauncher
+   ```
+2. Baixe as atualizações do GitHub:
+   ```bash
+   git pull origin master
+   ```
+3. Entre na pasta do MultiRoblox e rode o instalador novamente:
+   ```bash
+   cd MultiRoblox-Linux
+   ./instalar_multiroblox.sh
+   ```
+
 ## Como Usar
 
 1. Inicie o programa pelo menu de aplicativos procurando por **"MultiRoblox Linux"** ou digite `multiroblox` no terminal.
