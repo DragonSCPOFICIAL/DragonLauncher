@@ -128,27 +128,23 @@ class MultiRobloxApp:
         name = self.profile_listbox.get(selection[0])
         profile_path = PROFILES_DIR / name
         
-        # Isolamento de sandbox total para evitar detecção entre instâncias:
-        # --unshare=all: Isola IPC, Rede, Hostname, etc.
-        # --socket=x11 --socket=wayland --socket=pulseaudio: Permite apenas o essencial para vídeo e áudio.
+        # Isolamento equilibrado:
         # --persist=.: Mantém os dados locais no diretório do perfil.
-        # --env=DBUS_SESSION_BUS_ADDRESS=: Limpa o endereço do D-Bus para evitar comunicação entre instâncias.
+        # --unshare=ipc: Isola a memória de comunicação (evita conflitos de GPU/Áudio).
+        # --socket=pcsc: Isola sockets de comunicação.
+        # Mantemos o D-Bus e a Rede ativos para que o Sober consiga iniciar e conectar.
         
         try:
             cmd = [
                 "flatpak", "run", 
-                "--unshare=all",
-                "--socket=x11",
-                "--socket=wayland",
-                "--socket=pulseaudio",
                 "--persist=.",
+                "--unshare=ipc",
+                "--socket=pcsc",
                 SOBER_APP_ID
             ]
             
             env = os.environ.copy()
             env["HOME"] = str(profile_path)
-            # Desativa o D-Bus para esta instância para que ela não veja a outra
-            env["DBUS_SESSION_BUS_ADDRESS"] = ""
             
             subprocess.Popen(
                 cmd,
