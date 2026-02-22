@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import messagebox, simpledialog
 from pathlib import Path
 import shutil
+import time
 
 # Configurações de diretórios
 BASE_DIR = Path.home() / ".local" / "share" / "multiroblox"
@@ -14,7 +15,7 @@ class MultiRobloxApp:
     def __init__(self, root):
         self.root = root
         self.root.title("MultiRoblox Linux (Sober)")
-        self.root.geometry("450x550")
+        self.root.geometry("450x580")
         self.root.configure(bg="#1e1e1e")
         
         # Garantir que os diretórios existam
@@ -69,9 +70,22 @@ class MultiRobloxApp:
         # Outros botões
         tk.Button(btn_frame, text="Novo Perfil", command=self.create_profile, width=12, bg="#3d3d3d", fg="white", relief="flat").grid(row=1, column=0, padx=5, pady=5)
         tk.Button(btn_frame, text="Excluir Perfil", command=self.delete_profile, width=12, bg="#f44336", fg="white", relief="flat").grid(row=1, column=1, padx=5, pady=5)
-        tk.Button(btn_frame, text="Atualizar Lista", command=self.refresh_profiles, width=26, bg="#3d3d3d", fg="white", relief="flat").grid(row=2, column=0, columnspan=2, pady=5)
+        tk.Button(btn_frame, text="Limpar Travados", command=self.kill_sober_processes, width=26, bg="#ff9800", fg="white", relief="flat").grid(row=2, column=0, columnspan=2, pady=5)
+        tk.Button(btn_frame, text="Atualizar Lista", command=self.refresh_profiles, width=26, bg="#3d3d3d", fg="white", relief="flat").grid(row=3, column=0, columnspan=2, pady=5)
         
         tk.Label(self.root, text="Requer Sober (Flatpak) instalado.", bg="#1e1e1e", fg="#888888", font=("Segoe UI", 8, "italic")).pack(pady=10)
+
+    def kill_sober_processes(self, silent=False):
+        """Fecha processos do Sober que podem estar travados no fundo"""
+        try:
+            subprocess.run(["flatpak", "kill", SOBER_APP_ID], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run(["pkill", "-f", "sober"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run(["pkill", "-f", "roblox"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            if not silent:
+                messagebox.showinfo("Limpeza", "Processos do Sober limpos com sucesso!")
+        except Exception as e:
+            if not silent:
+                print(f"Erro ao limpar processos: {e}")
 
     def refresh_profiles(self):
         self.profile_listbox.delete(0, tk.END)
@@ -115,9 +129,9 @@ class MultiRobloxApp:
         name = self.profile_listbox.get(selection[0])
         profile_path = PROFILES_DIR / name
         
-        # O segredo do MultiRoblox no Linux:
-        # Isolamos o diretório HOME para que o Sober pense que é um novo usuário/sistema.
-        # Isso permite abrir várias janelas independentes.
+        self.kill_sober_processes(silent=True)
+        time.sleep(0.5)
+        
         env = os.environ.copy()
         env["HOME"] = str(profile_path)
         
@@ -129,7 +143,6 @@ class MultiRobloxApp:
                 stderr=subprocess.DEVNULL,
                 start_new_session=True
             )
-            # Pequeno delay visual para o usuário
             self.root.title(f"Lançando {name}...")
             self.root.after(2000, lambda: self.root.title("MultiRoblox Linux (Sober)"))
         except Exception as e:
