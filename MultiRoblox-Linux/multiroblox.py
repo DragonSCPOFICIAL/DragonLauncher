@@ -15,7 +15,7 @@ class MultiRobloxApp:
     def __init__(self, root):
         self.root = root
         self.root.title("MultiRoblox Linux (Sober)")
-        self.root.geometry("450x580")
+        self.root.geometry("450x600")
         self.root.configure(bg="#1e1e1e")
         
         # Garantir que os diretórios existam
@@ -76,9 +76,8 @@ class MultiRobloxApp:
         tk.Label(self.root, text="Requer Sober (Flatpak) instalado.", bg="#1e1e1e", fg="#888888", font=("Segoe UI", 8, "italic")).pack(pady=10)
 
     def kill_sober_processes(self, silent=False):
-        \"\"\"Fecha processos do Sober que podem estar travados no fundo\"\"\"
+        """Fecha processos do Sober que podem estar travados no fundo"""
         try:
-            # Tenta fechar instâncias do Sober
             subprocess.run(["pkill", "-f", "sober"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             subprocess.run(["pkill", "-f", "roblox"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             if not silent:
@@ -129,24 +128,23 @@ class MultiRobloxApp:
         name = self.profile_listbox.get(selection[0])
         profile_path = PROFILES_DIR / name
         
-        # O segredo para múltiplas instâncias no Sober (Flatpak):
-        # Usamos o comando --data-dir para isolar completamente os dados e o socket do Flatpak.
-        # Isso faz com que cada instância pense que é a única rodando no sistema.
+        # Isolamento de hardware extra para evitar congelamento:
+        # --unshare=ipc: Impede que instâncias compartilhem memória de comunicação (evita conflitos de GPU/Áudio)
+        # --socket=pcsc: Isola sockets de comunicação
+        # --persist=.: Mantém os dados locais
         
         try:
-            # Comando Flatpak com isolamento de diretório de dados
             cmd = [
                 "flatpak", "run", 
-                f"--command=sober", 
-                f"--persist=.", # Mantém os dados dentro do diretório especificado
+                "--unshare=ipc",
+                "--socket=pcsc",
+                "--persist=.",
                 SOBER_APP_ID
             ]
             
-            # Definimos o HOME para o diretório do perfil para isolar as configurações do Android/Sober
             env = os.environ.copy()
             env["HOME"] = str(profile_path)
             
-            # Lançamos o processo de forma independente
             subprocess.Popen(
                 cmd,
                 env=env,

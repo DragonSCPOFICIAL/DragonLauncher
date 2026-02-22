@@ -8,9 +8,28 @@ NC='\033[0m' # No Color
 echo -e "${BLUE}=== Instalador MultiRoblox Linux (Sober) ===${NC}"
 
 # Verificar se o Tkinter está instalado (pacote 'tk' no Arch Linux)
-if ! pacman -Qi tk &> /dev/null; then
-    echo -e "${BLUE}Instalando dependência necessária (tk)...${NC}"
-    sudo pacman -S --noconfirm tk
+# Verifica se o comando 'pacman' existe (indicando Arch Linux ou derivado)
+if command -v pacman &> /dev/null; then
+    if ! pacman -Qi tk &> /dev/null; then
+        echo -e "${BLUE}Instalando dependência necessária (tk) para Arch Linux...${NC}"
+        sudo pacman -S --noconfirm tk
+    fi
+# Verifica se o comando 'apt' existe (indicando Debian/Ubuntu ou derivado)
+elif command -v apt &> /dev/null; then
+    if ! dpkg -s python3-tk &> /dev/null; then
+        echo -e "${BLUE}Instalando dependência necessária (python3-tk) para Debian/Ubuntu...${NC}"
+        sudo apt update
+        sudo apt install -y python3-tk
+    fi
+# Verifica se o comando 'dnf' existe (indicando Fedora ou derivado)
+elif command -v dnf &> /dev/null; then
+    if ! rpm -q python3-tkinter &> /dev/null; then
+        echo -e "${BLUE}Instalando dependência necessária (python3-tkinter) para Fedora...${NC}"
+        sudo dnf install -y python3-tkinter
+    fi
+else
+    echo -e "${RED}Gerenciador de pacotes não suportado ou Tkinter não encontrado. Por favor, instale 'tk' ou 'python3-tk' manualmente.${NC}"
+    exit 1
 fi
 
 # Diretórios de instalação
