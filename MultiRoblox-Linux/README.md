@@ -1,0 +1,1 @@
+# MultiRoblox Linux (Sober)\n\nGerenciador de múltiplas instâncias do Roblox para Linux utilizando o Sober.\n\n## Como usar\n\n1. Execute o script de instalação:\n   ```bash\n   chmod +x instalar_multiroblox.sh\n   ./instalar_multiroblox.sh\n   ```\n2. Inicie o programa pelo menu de aplicativos ou digitando `multiroblox` no terminal.
