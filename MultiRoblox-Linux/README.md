@@ -19,9 +19,9 @@ Gerenciador de múltiplas instâncias do Roblox para Linux utilizando o Sober (F
 ## Como Instalar
 
 1. Abra o seu terminal.
-2. Clone o repositório (se ainda não o tiver):
+2. Clone o repositório (se já tiver a pasta, apague-a primeiro para evitar erros):
    ```bash
-   git clone https://github.com/DragonSCPOFICIAL/DragonLauncher.git
+   rm -rf DragonLauncher && git clone https://github.com/DragonSCPOFICIAL/DragonLauncher.git
    ```
 3. Entre na pasta do MultiRoblox:
    ```bash
