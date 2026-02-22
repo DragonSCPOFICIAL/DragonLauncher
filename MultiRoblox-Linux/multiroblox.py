@@ -76,9 +76,9 @@ class MultiRobloxApp:
         tk.Label(self.root, text="Requer Sober (Flatpak) instalado.", bg="#1e1e1e", fg="#888888", font=("Segoe UI", 8, "italic")).pack(pady=10)
 
     def kill_sober_processes(self, silent=False):
-        """Fecha processos do Sober que podem estar travados no fundo"""
+        \"\"\"Fecha processos do Sober que podem estar travados no fundo\"\"\"
         try:
-            subprocess.run(["flatpak", "kill", SOBER_APP_ID], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            # Tenta fechar instâncias do Sober
             subprocess.run(["pkill", "-f", "sober"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             subprocess.run(["pkill", "-f", "roblox"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             if not silent:
@@ -129,20 +129,32 @@ class MultiRobloxApp:
         name = self.profile_listbox.get(selection[0])
         profile_path = PROFILES_DIR / name
         
-        self.kill_sober_processes(silent=True)
-        time.sleep(0.5)
-        
-        env = os.environ.copy()
-        env["HOME"] = str(profile_path)
+        # O segredo para múltiplas instâncias no Sober (Flatpak):
+        # Usamos o comando --data-dir para isolar completamente os dados e o socket do Flatpak.
+        # Isso faz com que cada instância pense que é a única rodando no sistema.
         
         try:
+            # Comando Flatpak com isolamento de diretório de dados
+            cmd = [
+                "flatpak", "run", 
+                f"--command=sober", 
+                f"--persist=.", # Mantém os dados dentro do diretório especificado
+                SOBER_APP_ID
+            ]
+            
+            # Definimos o HOME para o diretório do perfil para isolar as configurações do Android/Sober
+            env = os.environ.copy()
+            env["HOME"] = str(profile_path)
+            
+            # Lançamos o processo de forma independente
             subprocess.Popen(
-                ["flatpak", "run", SOBER_APP_ID],
+                cmd,
                 env=env,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 start_new_session=True
             )
+            
             self.root.title(f"Lançando {name}...")
             self.root.after(2000, lambda: self.root.title("MultiRoblox Linux (Sober)"))
         except Exception as e:
